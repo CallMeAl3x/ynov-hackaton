@@ -1,12 +1,5 @@
 import React from "react";
-
-import { Poppins } from "next/font/google";
-import { cn } from "@/lib/utils";
-
-const font = Poppins({
-  subsets: ["latin"],
-  weight: ["600"]
-});
+import Link from "next/link";
 
 interface HeaderProps {
   label: string;
@@ -15,8 +8,16 @@ interface HeaderProps {
 const Header = ({ label }: HeaderProps) => {
   return (
     <div className="w-full flex flex-col gap-y-4 items-center justify-center">
-      <h1 className={cn("text-3xl font-semibold", font.className)}>Auth</h1>
-      <p className="text-muted-foreground">{label}</p>
+      <Link href="/" className="flex items-center space-x-2 mb-2 hover:opacity-80 transition">
+        <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+          <span className="text-white font-bold text-sm">WF</span>
+        </div>
+        <span className="font-bold text-lg text-gray-900">
+          Webnovel Factory
+        </span>
+      </Link>
+      <h2 className="text-2xl font-bold text-gray-900">{label}</h2>
+      <p className="text-gray-600 text-sm">Rejoignez notre communauté de créateurs</p>
     </div>
   );
 };

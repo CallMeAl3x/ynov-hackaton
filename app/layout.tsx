@@ -3,31 +3,6 @@ import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "Webnovel Factory",
-  description: "Créez et lisez des histoires assistées par IA",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Webnovel Factory",
-  },
-  formatDetection: {
-    telephone: false,
-  },
-  openGraph: {
-    type: "website",
-    siteName: "Webnovel Factory",
-    title: "Webnovel Factory",
-    description: "Créez et lisez des histoires assistées par IA",
-  },
-  twitter: {
-    card: "summary",
-    title: "Webnovel Factory",
-    description: "Créez et lisez des histoires assistées par IA",
-  },
-};
-
 export default async function RootLayout({
   children
 }: Readonly<{

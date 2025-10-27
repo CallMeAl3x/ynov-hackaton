@@ -1,5 +1,41 @@
-import { TwoFactorMethod, UserRole } from "@prisma/client";
+import { TwoFactorMethod, UserRole, CharacterRole } from "@prisma/client";
 import * as z from "zod";
+
+// Story Creation Schemas
+export const StoryBasicSchema = z.object({
+  name: z.string().min(1, {
+    message: "Story title is required"
+  }).max(200, {
+    message: "Story title must be less than 200 characters"
+  }),
+  theme: z.string().min(1, {
+    message: "Story theme is required"
+  }),
+  subject: z.string().min(10, {
+    message: "Story subject must be at least 10 characters"
+  }).max(5000, {
+    message: "Story subject must be less than 5000 characters"
+  }),
+  description: z.optional(z.string().max(1000)).default("")
+});
+
+export const CharacterCreateSchema = z.object({
+  name: z.string().min(1, {
+    message: "Character name is required"
+  }),
+  description: z.string().min(10, {
+    message: "Character description must be at least 10 characters"
+  }),
+  role: z.enum([CharacterRole.PROTAGONIST, CharacterRole.ANTAGONIST, CharacterRole.SECONDARY, CharacterRole.MINOR])
+});
+
+export const AIStoryGenerationSchema = z.object({
+  subject: z.string().min(10, {
+    message: "Please provide at least 10 characters describing your story idea"
+  }).max(2000, {
+    message: "Subject must be less than 2000 characters"
+  })
+});
 
 export const LoginSchema = z.object({
   email: z.string().email({

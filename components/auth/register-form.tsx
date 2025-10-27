@@ -38,8 +38,8 @@ export const RegisterForm = () => {
 
   return (
     <CardWrapper
-      headerLabel="Create an account"
-      backButtonLabel="Already have an account ?"
+      headerLabel="Créer un compte"
+      backButtonLabel="Déjà inscrit ? Se connecter"
       backButtonHref="/auth/login"
       showSocial
     >
@@ -51,9 +51,14 @@ export const RegisterForm = () => {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel className="text-gray-700 font-medium">Nom complet</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="john.doe" disabled={isPending} />
+                    <Input
+                      {...field}
+                      placeholder="Jean Dupont"
+                      disabled={isPending}
+                      className="border-gray-300 focus:border-black focus:ring-black"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -64,9 +69,15 @@ export const RegisterForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-gray-700 font-medium">Email</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="john.doe@example.com" type="email" disabled={isPending} />
+                    <Input
+                      {...field}
+                      placeholder="vous@exemple.com"
+                      type="email"
+                      disabled={isPending}
+                      className="border-gray-300 focus:border-black focus:ring-black"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -77,10 +88,17 @@ export const RegisterForm = () => {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel className="text-gray-700 font-medium">Mot de passe</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="*******" type="password" disabled={isPending} />
+                    <Input
+                      {...field}
+                      placeholder="••••••••"
+                      type="password"
+                      disabled={isPending}
+                      className="border-gray-300 focus:border-black focus:ring-black"
+                    />
                   </FormControl>
+                  <p className="text-xs text-gray-500 mt-1">Minimum 6 caractères</p>
                   <FormMessage />
                 </FormItem>
               )}
@@ -88,8 +106,12 @@ export const RegisterForm = () => {
           </div>
           <FormError message={error} />
           <FormSuccess message={success} />
-          <Button type="submit" className="w-full" disabled={isPending}>
-            Register
+          <Button
+            type="submit"
+            className="w-full bg-black hover:bg-gray-800 text-white font-medium py-2"
+            disabled={isPending}
+          >
+            S'inscrire
           </Button>
         </form>
       </Form>

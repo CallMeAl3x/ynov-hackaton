@@ -18,7 +18,7 @@ export const LoginForm = () => {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
   const urlError =
-    searchParams.get("error") === "OAuthAccountNotLinked" ? "Email already in use with different providers" : undefined;
+    searchParams.get("error") === "OAuthAccountNotLinked" ? "Cet email est déjà utilisé avec un autre fournisseur" : undefined;
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [showTwoFactor, setShowTwoFactor] = useState(false);
@@ -52,15 +52,15 @@ export const LoginForm = () => {
           }
         })
         .catch(() => {
-          setError("An error occurred");
+          setError("Une erreur est survenue");
         });
     });
   };
 
   return (
     <CardWrapper
-      headerLabel="Welcome back"
-      backButtonLabel="Don't have an account ?"
+      headerLabel="Bienvenue"
+      backButtonLabel="Pas encore de compte ? S'inscrire"
       backButtonHref="/auth/register"
       showSocial
     >
@@ -74,9 +74,15 @@ export const LoginForm = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel className="text-gray-700 font-medium">Email</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="john.doe@example.com" type="email" disabled={isPending} />
+                        <Input
+                          {...field}
+                          placeholder="vous@exemple.com"
+                          type="email"
+                          disabled={isPending}
+                          className="border-gray-300 focus:border-black focus:ring-black"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -87,14 +93,21 @@ export const LoginForm = () => {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Password</FormLabel>
+                      <div className="flex justify-between items-center">
+                        <FormLabel className="text-gray-700 font-medium">Mot de passe</FormLabel>
+                        <Button size="sm" variant="link" asChild className="px-0 font-normal text-sm text-gray-600 hover:text-black h-auto">
+                          <Link href="/auth/reset">Mot de passe oublié ?</Link>
+                        </Button>
+                      </div>
                       <FormControl>
-                        <Input {...field} placeholder="*******" type="password" disabled={isPending} />
+                        <Input
+                          {...field}
+                          placeholder="••••••••"
+                          type="password"
+                          disabled={isPending}
+                          className="border-gray-300 focus:border-black focus:ring-black"
+                        />
                       </FormControl>
-
-                      <Button size="sm" variant="link" asChild className="px-0 font-normal">
-                        <Link href="/auth/reset">Forgot password ?</Link>
-                      </Button>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -106,9 +119,14 @@ export const LoginForm = () => {
                 name="code"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Two Factor Code</FormLabel>
+                    <FormLabel className="text-gray-700 font-medium">Code de vérification</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="123456" disabled={isPending} />
+                      <Input
+                        {...field}
+                        placeholder="123456"
+                        disabled={isPending}
+                        className="border-gray-300 focus:border-black focus:ring-black"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -118,8 +136,12 @@ export const LoginForm = () => {
           </div>
           <FormError message={error || urlError} />
           <FormSuccess message={success} />
-          <Button type="submit" className="w-full" disabled={isPending}>
-            {showTwoFactor ? "Comfirm" : "Login"}
+          <Button
+            type="submit"
+            className="w-full bg-black hover:bg-gray-800 text-white font-medium py-2"
+            disabled={isPending}
+          >
+            {showTwoFactor ? "Vérifier" : "Se connecter"}
           </Button>
         </form>
       </Form>
