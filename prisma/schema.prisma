@@ -1,9 +1,10 @@
 datasource db {
-  provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
+
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 enum UserRole {
@@ -16,69 +17,188 @@ enum TwoFactorMethod {
   OTP
 }
 
+enum StoryStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ConversationPurpose {
+  STORY_CREATION
+  EPISODE_GENERATION
+  STORY_EDITING
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+enum CharacterRole {
+  PROTAGONIST
+  ANTAGONIST
+  SECONDARY
+  MINOR
+}
+
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          UserRole @default(USER)
-  accounts      Account[]
-  isTwoFactorEnabled Boolean @default(false)
+  id                    String                 @id @default(cuid())
+  name                  String?
+  email                 String?                @unique
+  emailVerified         DateTime?
+  image                 String?
+  password              String?
+  role                  UserRole               @default(USER)
+  accounts              Account[]
+  isTwoFactorEnabled    Boolean                @default(false)
   TwoFactorConfirmation TwoFactorConfirmation?
-  TwoFactorMethod TwoFactorMethod? @default(EMAIL)
-  otpSecret   String? @db.Text
+  TwoFactorMethod       TwoFactorMethod?       @default(EMAIL)
+  otpSecret             String?                @db.Text
+
+  // Relations Webnovel Factory
+  stories       Story[]
+  conversations Conversation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String 
-  type               String
-  provider           String
-  providerAccountId  String 
-  refresh_token      String? @db.Text
-  access_token       String? @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String? @db.Text
-  session_state      String?
- 
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   @@unique([provider, providerAccountId])
 }
 
 model VerificationToken {
-  id        String   @id @default(cuid())
-  email     String
-  token     String   @unique
-  expires   DateTime
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
   @@unique([email, token])
 }
 
 model PasswordResetToken {
-  id        String   @id @default(cuid())
-  email     String
-  token     String   @unique
-  expires   DateTime
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
   @@unique([email, token])
 }
 
 model twoFactorToken {
-  id        String   @id @default(cuid())
-  email     String
-  token     String   @unique
-  expires   DateTime
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
   @@unique([email, token])
 }
 
 model TwoFactorConfirmation {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
-  userId    String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([userId])
+}
+
+model Story {
+  id          String      @id @default(cuid())
+  name        String
+  description String?     @db.Text
+  theme       String
+  subject     String      @db.Text
+  coverImage  String?
+  status      StoryStatus @default(DRAFT)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  episodes      Episode[]
+  characters    Character[]
+  conversations Conversation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([authorId])
+  @@index([status])
+}
+
+model Episode {
+  id        String  @id @default(cuid())
+  storyId   String
+  name      String
+  content   String  @db.Text
+  order     Int
+  published Boolean @default(false)
+
+  story Story @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([storyId, order])
+  @@index([storyId])
+}
+
+model Character {
+  id            String        @id @default(cuid())
+  name          String
+  description   String        @db.Text
+  role          CharacterRole @default(SECONDARY)
+  relationships String?       @db.Text
+
+  storyId String
+  story   Story  @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storyId])
+}
+
+model Conversation {
+  id        String              @id @default(cuid())
+  userId    String
+  storyId   String?
+  purpose   ConversationPurpose @default(STORY_CREATION)
+  startedAt DateTime            @default(now())
+  endedAt   DateTime?
+
+  messages Message[]
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story    Story?    @relation(fields: [storyId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([storyId])
+}
+
+model Message {
+  id             String      @id @default(cuid())
+  conversationId String
+  role           MessageRole
+  content        String      @db.Text
+  createdAt      DateTime    @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
 }
