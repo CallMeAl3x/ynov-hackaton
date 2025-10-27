@@ -7,6 +7,10 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Book, Users, Info, Trash2, Edit } from "lucide-react";
 import { deleteStory } from "@/actions/delete-story";
+import { deleteCharacter } from "@/actions/delete-character";
+import { EditStoryModal } from "./edit-story-modal";
+import { EditCharacterModal } from "./edit-character-modal";
+import { CreateCharacterModal } from "./create-character-modal";
 
 type Character = {
   id: string;
@@ -37,16 +41,34 @@ interface StoryViewClientProps {
   characters: Character[];
 }
 
-export function StoryViewClient({ story, characters }: StoryViewClientProps) {
+export function StoryViewClient({
+  story,
+  characters: initialCharacters,
+}: StoryViewClientProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"info" | "characters">("info");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCreateCharacterModalOpen, setIsCreateCharacterModalOpen] =
+    useState(false);
+  const [editingCharacterId, setEditingCharacterId] = useState<string | null>(
+    null
+  );
+  const [characters, setCharacters] = useState(initialCharacters);
+  const [storyData, setStoryData] = useState({
+    name: story.name ?? "Untitled story",
+    theme: story.theme,
+  });
 
-  const title = story.name ?? "Untitled story";
+  const title = storyData.name;
   const description = story.description ?? "";
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this story? This action cannot be undone.")) {
+    if (
+      !confirm(
+        "Are you sure you want to delete this story? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
@@ -84,7 +106,10 @@ export function StoryViewClient({ story, characters }: StoryViewClientProps) {
   return (
     <div className="max-w-4xl mx-auto py-12 px-4">
       {/* Back Button */}
-      <Link href="/storys" className="text-sm text-sky-600 hover:text-sky-700 mb-4 inline-block">
+      <Link
+        href="/storys"
+        className="text-sm text-sky-600 hover:text-sky-700 mb-4 inline-block"
+      >
         ← Back to stories
       </Link>
 
@@ -140,10 +165,19 @@ export function StoryViewClient({ story, characters }: StoryViewClientProps) {
           <div className="space-y-6">
             {/* Story Details Card */}
             <Card className="p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Book className="w-5 h-5 text-sky-600" />
-                Story Details
-              </h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+                  <Book className="w-5 h-5 text-sky-600" />
+                  Story Details
+                </h2>
+                <button
+                  onClick={() => setIsEditModalOpen(true)}
+                  className="inline-flex items-center gap-1 rounded px-3 py-1 text-sm text-sky-600 hover:bg-sky-50 transition-colors"
+                >
+                  <Edit className="w-4 h-4" />
+                  Edit
+                </button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Subject</p>
@@ -184,7 +218,9 @@ export function StoryViewClient({ story, characters }: StoryViewClientProps) {
 
             {/* JSON Debug Card */}
             <Card className="p-6 bg-gray-50">
-              <h3 className="text-sm font-medium text-gray-600 mb-3">Raw Data</h3>
+              <h3 className="text-sm font-medium text-gray-600 mb-3">
+                Raw Data
+              </h3>
               <pre className="text-xs overflow-auto max-h-96 text-gray-800">
                 {JSON.stringify(story, null, 2)}
               </pre>
@@ -194,15 +230,29 @@ export function StoryViewClient({ story, characters }: StoryViewClientProps) {
 
         {/* Characters Tab */}
         {activeTab === "characters" && (
-          <div className="space-y-4">
+          <div className="space-y-4 flex justify-end flex-col gap-2">
+            <button
+              onClick={() => setIsCreateCharacterModalOpen(true)}
+              className="inline-flex items-center gap-2 rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700 transition-colors w-fit ml-auto"
+            >
+              + New Character
+            </button>
             {characters.length > 0 ? (
               characters.map((character) => (
-                <Card key={character.id} className="p-6 hover:shadow-lg transition-shadow">
+                <Card
+                  key={character.id}
+                  className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                  onClick={() => router.push(`/story/${story.id}/character/${character.id}`)}
+                >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900">
+                      <Link
+                        href={`/story/${story.id}/character/${character.id}`}
+                        className="text-lg font-semibold text-gray-900 hover:text-sky-600 transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         {character.name}
-                      </h3>
+                      </Link>
                       <Badge
                         className={`mt-2 ${getRoleColor(character.role)}`}
                         variant="outline"
@@ -214,12 +264,46 @@ export function StoryViewClient({ story, characters }: StoryViewClientProps) {
                       </p>
                       {character.relationships && (
                         <div className="mt-3 pt-3 border-t border-gray-200">
-                          <p className="text-xs font-medium text-gray-600">Relationships</p>
+                          <p className="text-xs font-medium text-gray-600">
+                            Relationships
+                          </p>
                           <p className="mt-1 text-sm text-gray-700">
                             {character.relationships}
                           </p>
                         </div>
                       )}
+                    </div>
+                    <div className="ml-4 flex flex-col gap-2">
+                      <button
+                        onClick={() => setEditingCharacterId(character.id)}
+                        className="inline-flex items-center gap-1 rounded px-3 py-1 text-sm text-sky-600 hover:bg-sky-50 transition-colors"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={async () => {
+                          if (
+                            !confirm(
+                              "Are you sure you want to delete this character?"
+                            )
+                          ) {
+                            return;
+                          }
+                          const result = await deleteCharacter(character.id);
+                          if (result.success) {
+                            setCharacters(
+                              characters.filter((c) => c.id !== character.id)
+                            );
+                          } else {
+                            alert("Failed to delete character");
+                          }
+                        }}
+                        className="inline-flex items-center gap-1 rounded px-3 py-1 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </button>
                     </div>
                   </div>
                 </Card>
@@ -242,13 +326,13 @@ export function StoryViewClient({ story, characters }: StoryViewClientProps) {
 
       {/* Footer Actions */}
       <div className="flex gap-3 pt-6 border-t border-gray-200">
-        <Link
-          href={`/story/${story.id}/setup`}
+        <button
+          onClick={() => setIsEditModalOpen(true)}
           className="inline-flex items-center gap-2 rounded-md border border-slate-200 px-6 py-2 text-sm font-medium hover:bg-slate-50 transition-colors"
         >
           <Edit className="w-4 h-4" />
           Edit
-        </Link>
+        </button>
 
         <button
           onClick={handleDelete}
@@ -259,6 +343,75 @@ export function StoryViewClient({ story, characters }: StoryViewClientProps) {
           {isDeleting ? "Deleting..." : "Delete"}
         </button>
       </div>
+
+      <EditStoryModal
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        storyId={story.id}
+        initialName={storyData.name}
+        initialTheme={storyData.theme}
+        onSuccess={(updatedData) => {
+          setStoryData(updatedData);
+        }}
+      />
+
+      {editingCharacterId && (
+        <EditCharacterModal
+          open={!!editingCharacterId}
+          onOpenChange={(open) => {
+            if (!open) setEditingCharacterId(null);
+          }}
+          characterId={editingCharacterId}
+          initialName={
+            characters.find((c) => c.id === editingCharacterId)?.name || ""
+          }
+          initialDescription={
+            characters.find((c) => c.id === editingCharacterId)?.description ||
+            ""
+          }
+          initialRole={
+            characters.find((c) => c.id === editingCharacterId)?.role || "MINOR"
+          }
+          onSuccess={(updatedData) => {
+            setCharacters(
+              characters.map((c) =>
+                c.id === editingCharacterId
+                  ? {
+                      ...c,
+                      name: updatedData.name,
+                      description: updatedData.description,
+                      role: updatedData.role as
+                        | "PROTAGONIST"
+                        | "ANTAGONIST"
+                        | "SECONDARY"
+                        | "MINOR",
+                    }
+                  : c
+              )
+            );
+            setEditingCharacterId(null);
+          }}
+        />
+      )}
+
+      <CreateCharacterModal
+        open={isCreateCharacterModalOpen}
+        onOpenChange={setIsCreateCharacterModalOpen}
+        storyId={story.id}
+        onSuccess={(newCharacter) => {
+          setCharacters([
+            ...characters,
+            {
+              ...newCharacter,
+              role: newCharacter.role as
+                | "PROTAGONIST"
+                | "ANTAGONIST"
+                | "SECONDARY"
+                | "MINOR",
+            },
+          ]);
+        }}
+      />
     </div>
   );
 }
