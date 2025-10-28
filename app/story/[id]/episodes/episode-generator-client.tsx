@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { createEpisode } from "@/actions/create-episode";
-import { generateEpisodeWithAI } from "@/actions/generate-episode";
 import { buildEpisodePrompt } from "@/lib/prompts";
 import { getRoleLabel, getRoleBadgeColor } from "@/lib/role-utils";
 import { MarkdownPreview } from "./markdown-preview";
@@ -87,31 +86,109 @@ export function EpisodeGeneratorClient({
     setEpisodeContent("");
 
     try {
-      const result = await generateEpisodeWithAI(
-        story,
-        characters,
-        episodes,
-        guidancePrompt || undefined
-      );
+      // Build the prompt on the client side
+      let prompt = buildEpisodePrompt(story, characters, episodes);
 
-      if (result.success && result.content) {
-        setEpisodeContent(result.content);
-        const wordCount = countWords(result.content);
+      // Add guidance if provided
+      if (guidancePrompt && guidancePrompt.trim()) {
+        prompt += `\n\nGUIDANCE SUPPLÉMENTAIRE DE L'UTILISATEUR:\n${guidancePrompt}\n\nIntègre cette guidance dans la génération de l'épisode.`;
+      }
 
-        if (wordCount > 2500) {
-          setError(
-            `Le contenu généré dépasse la limite de 2500 mots (${wordCount} mots générés). Veuillez réduire ou régénérer.`
-          );
-          setEpisodeContent("");
-          setIsGenerating(false);
-          return;
+      // Call the Ollama API directly with streaming
+      const response = await fetch(`/api/ollama`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt,
+          stream: true,
+          model: "gpt-oss:120b-cloud",
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to generate episode");
+      }
+
+      if (!response.body) {
+        throw new Error("No response body from API");
+      }
+
+      // Stream the response and display content progressively
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let fullContent = "";
+
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // Split by newlines and process complete lines (NDJSON format)
+        const lines = buffer.split("\n");
+        buffer = lines[lines.length - 1]; // Keep incomplete line in buffer
+
+        for (let i = 0; i < lines.length - 1; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+
+          try {
+            const chunk = JSON.parse(line);
+            const token =
+              chunk?.message?.content ??
+              chunk?.response ??
+              chunk?.content ??
+              "";
+            if (token) {
+              fullContent += token;
+              // Update the content progressively
+              setEpisodeContent(fullContent);
+            }
+          } catch (e) {
+            // Skip invalid JSON lines
+          }
         }
+      }
 
+      // Process any remaining content in buffer
+      if (buffer.trim()) {
+        try {
+          const chunk = JSON.parse(buffer);
+          const token =
+            chunk?.message?.content ??
+            chunk?.response ??
+            chunk?.content ??
+            "";
+          if (token) {
+            fullContent += token;
+            setEpisodeContent(fullContent);
+          }
+        } catch (e) {
+          // Skip invalid JSON
+        }
+      }
+
+      reader.releaseLock();
+
+      // Validate word count
+      const wordCount = countWords(fullContent);
+      if (wordCount > 2500) {
+        setError(
+          `Le contenu généré dépasse la limite de 2500 mots (${wordCount} mots générés). Veuillez réduire ou régénérer.`
+        );
+        setEpisodeContent("");
+        setIsGenerating(false);
+        return;
+      }
+
+      if (!fullContent.trim()) {
+        setError("Aucun contenu généré. Veuillez réessayer.");
+        setEpisodeContent("");
+      } else {
         setSuccess("Épisode généré avec succès!");
         setShowGuidance(false);
-      } else {
-        setError(result.error || "Erreur lors de la génération");
-        setEpisodeContent("");
       }
     } catch (err) {
       const errorMsg =

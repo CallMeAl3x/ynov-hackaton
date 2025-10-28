@@ -11,7 +11,12 @@ const ollama = new Ollama({
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { model = "gpt-oss:120b-cloud", prompt, stream = true, maxWords = 2500 } = body;
+    const {
+      model = "gpt-oss:120b-cloud",
+      prompt,
+      stream = true,
+      maxWords = 2500,
+    } = body;
 
     if (!prompt || typeof prompt !== "string") {
       return new Response(

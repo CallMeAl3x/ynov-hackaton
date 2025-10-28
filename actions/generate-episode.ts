@@ -61,53 +61,106 @@ export const generateEpisodeWithAI = async (
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         prompt,
-        stream: false,
-        model: "gpt-oss:120b-cloud"
-      })
+        stream: true,
+        model: "gpt-oss:120b-cloud",
+      }),
     });
 
-    const responseText = await response.text();
     console.log("[GENERATE_EPISODE] Response status:", response.status);
 
     if (!response.ok) {
+      const errorText = await response.text();
       console.error("[GENERATE_EPISODE] API Error - Status:", response.status);
-      console.error("[GENERATE_EPISODE] API Error - Response:", responseText);
+      console.error("[GENERATE_EPISODE] API Error - Response:", errorText);
       return {
         error: `Failed to generate episode with AI (Status: ${response.status}). Please try again.`,
-        content: null
+        content: null,
       };
     }
 
-    let apiResult;
-    try {
-      apiResult = JSON.parse(responseText);
-    } catch (e) {
-      console.error("[GENERATE_EPISODE] Failed to parse response as JSON:", e);
+    // Handle streaming NDJSON response
+    if (!response.body) {
       return {
-        error: "AI API returned invalid response. Please try again.",
-        content: null
+        error: "No response body from API. Please try again.",
+        content: null,
       };
     }
 
-    const content = apiResult.response || apiResult.output || "";
-    console.log("[GENERATE_EPISODE] Generated content length:", content.length);
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let fullContent = "";
+    let buffer = "";
 
-    if (!content.trim()) {
+    try {
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // Split by newlines and process complete lines (NDJSON format)
+        const lines = buffer.split("\n");
+        buffer = lines[lines.length - 1]; // Keep incomplete line in buffer
+
+        for (let i = 0; i < lines.length - 1; i++) {
+          const line = lines[i].trim();
+          if (!line) continue;
+
+          try {
+            const chunk = JSON.parse(line);
+            const token =
+              chunk?.message?.content ??
+              chunk?.response ??
+              chunk?.content ??
+              "";
+            if (token) {
+              fullContent += token;
+            }
+          } catch (e) {
+            // Skip lines that aren't valid JSON
+            console.warn("[GENERATE_EPISODE] Skipped invalid JSON line:", line.substring(0, 100));
+          }
+        }
+      }
+
+      // Process any remaining content in buffer
+      if (buffer.trim()) {
+        try {
+          const chunk = JSON.parse(buffer);
+          const token =
+            chunk?.message?.content ??
+            chunk?.response ??
+            chunk?.content ??
+            "";
+          if (token) {
+            fullContent += token;
+          }
+        } catch (e) {
+          console.warn("[GENERATE_EPISODE] Skipped final invalid JSON:", buffer.substring(0, 100));
+        }
+      }
+    } finally {
+      reader.releaseLock();
+    }
+
+    console.log("[GENERATE_EPISODE] Generated content length:", fullContent.length);
+
+    if (!fullContent.trim()) {
       return {
         error: "No content generated. Please try again.",
-        content: null
+        content: null,
       };
     }
 
     return {
       success: true,
-      content
+      content: fullContent,
     };
   } catch (error) {
     console.error("[GENERATE_EPISODE]", error);
     return {
       error: "Failed to generate episode. Please try again.",
-      content: null
+      content: null,
     };
   }
 };

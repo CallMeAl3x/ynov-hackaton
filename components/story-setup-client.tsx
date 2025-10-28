@@ -151,7 +151,7 @@ export default function StorySetupClient({
         const result = await createCharacter(storyId, {
           name: character.name,
           description: character.description,
-          role: character.role as any,
+          role: character.role as "PROTAGONIST" | "ANTAGONIST" | "SECONDARY" | "MINOR",
         });
 
         if (result.error) {
@@ -245,7 +245,7 @@ export default function StorySetupClient({
                   <button
                     key={r.value}
                     type="button"
-                    onClick={() => form.setValue("role", r.value as any)}
+                    onClick={() => form.setValue("role", r.value as "PROTAGONIST" | "ANTAGONIST" | "SECONDARY" | "MINOR")}
                     className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
                       form.watch("role") === r.value
                         ? "border-sky-600 bg-sky-50"

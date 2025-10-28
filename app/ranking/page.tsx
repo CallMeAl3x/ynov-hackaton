@@ -38,7 +38,7 @@ async function getRankingUsers(): Promise<RankingUser[]> {
         points: user.stories.length * 100 + Math.floor(Math.random() * 500), // Fake points calculation
         rank: index + 1,
         storiesCount: user.stories.length,
-        image: user.image,
+        image: user.image || undefined,
       }))
       .sort((a, b) => b.points - a.points)
       .map((user, index) => ({

@@ -22,5 +22,16 @@ export default async function AIReviewPage({ params }: Props) {
 
   const characters = await getCharactersByStoryId(id);
 
-  return <AIStoryReview story={story as any} characters={characters} />;
+  return (
+    <AIStoryReview
+      story={{
+        id: story.id,
+        name: story.name,
+        theme: story.theme,
+        subject: story.subject,
+        description: story.description || undefined,
+      }}
+      characters={characters}
+    />
+  );
 }

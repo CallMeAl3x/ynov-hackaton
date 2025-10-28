@@ -14,7 +14,15 @@ export default async function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
-      <ProfileClient user={user as any} stories={stories} />
+      <ProfileClient
+        user={{
+          id: user.id,
+          name: user.name || null,
+          email: user.email || null,
+          image: user.image || null,
+        }}
+        stories={stories}
+      />
     </div>
   );
 }

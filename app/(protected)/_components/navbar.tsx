@@ -1,17 +1,13 @@
 "use client";
 
 import { UserButton } from "@/components/auth/user-button";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { XpBar } from "@/components/xp-bar";
 import Image from "next/image";
 import { useState } from "react";
 import { FaCoins } from "react-icons/fa";
 import { useCurrentUser } from "@/hooks/use-current-user";
 
 export const Navbar = () => {
-  const pathname = usePathname();
-  const [xp, setXp] = useState(50);
   const [coins, setCoins] = useState(120);
   const [showMenu, setShowMenu] = useState(false);
   const user = useCurrentUser();
@@ -59,22 +55,22 @@ export const Navbar = () => {
 
           {/* Right: XP + Coins + Mobile burger */}
           <div className="flex items-center gap-2 sm:gap-4">
-            {/* XP bar - Hidden on very small screens */}
-            <div className="hidden xs:flex flex-col w-12 sm:w-16">
-              <div className="relative w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${xp}%` }}
-                />
-              </div>
-            </div>
-
             {user && (
               <>
+                {/* XP Bar with Level - Hidden on very small screens */}
+                <div className="hidden sm:flex">
+                  <XpBar currentXp={750} maxXpPerLevel={1000} compact={false} />
+                </div>
+
+                {/* XP Bar Compact - Visible only on small screens */}
+                <div className="flex sm:hidden">
+                  <XpBar currentXp={750} maxXpPerLevel={1000} compact={true} />
+                </div>
+
                 {/* Coins - Responsive */}
                 <div className="flex items-center gap-1 text-xs sm:text-sm">
                   <FaCoins className="text-yellow-400 w-4 h-4" />
-                  <span className="font-medium hidden xs:inline">{coins}</span>
+                  <span className="font-medium inline">{coins}</span>
                 </div>
 
                 {/* Profile */}
