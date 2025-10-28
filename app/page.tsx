@@ -4,8 +4,16 @@ import { Features } from "@/components/landing/features";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { CTA } from "@/components/landing/cta";
 import { Footer } from "@/components/landing/footer";
+import { currentUser } from "@/lib/auth";
+import { Dashboard } from "@/components/dashboard";
 
-export default function Home() {
+export default async function Home() {
+  const user = await currentUser();
+
+  if (user) {
+    return <Dashboard />;
+  }
+
   return (
     <main className="min-h-screen bg-white">
       <LandingNavbar />

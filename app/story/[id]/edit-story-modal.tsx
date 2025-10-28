@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -37,7 +38,9 @@ interface EditStoryModalProps {
   storyId: string;
   initialName: string;
   initialTheme: string;
-  onSuccess: (updatedData: { name: string; theme: string }) => void;
+  initialSubject?: string;
+  initialDescription?: string;
+  onSuccess: (updatedData: { name: string; theme: string; subject?: string; description?: string }) => void;
 }
 
 export function EditStoryModal({
@@ -46,10 +49,14 @@ export function EditStoryModal({
   storyId,
   initialName,
   initialTheme,
+  initialSubject = "",
+  initialDescription = "",
   onSuccess,
 }: EditStoryModalProps) {
   const [name, setName] = useState(initialName);
   const [theme, setTheme] = useState(initialTheme);
+  const [subject, setSubject] = useState(initialSubject);
+  const [description, setDescription] = useState(initialDescription);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -59,10 +66,10 @@ export function EditStoryModal({
     setIsLoading(true);
 
     try {
-      const result = await updateStory(storyId, { name, theme });
+      const result = await updateStory(storyId, { name, theme, subject, description });
 
       if (result.success) {
-        onSuccess({ name, theme });
+        onSuccess({ name, theme, subject, description });
         onOpenChange(false);
       } else {
         setError(result.error || "Failed to update story");
@@ -109,6 +116,30 @@ export function EditStoryModal({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="subject">Subject</Label>
+            <Textarea
+              id="subject"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Enter story subject/plot"
+              disabled={isLoading}
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description (optional)</Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter story description"
+              disabled={isLoading}
+              rows={2}
+            />
           </div>
 
           {error && <div className="text-sm text-red-600">{error}</div>}

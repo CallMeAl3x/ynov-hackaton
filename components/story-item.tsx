@@ -40,7 +40,7 @@ export default function StoryItem({ story }: { story: any }) {
 
       <div className="flex items-center gap-2">
         <Link
-          href={`/story/${story.id}/setup`}
+          href={`/story/${story.id}/edit`}
           className="text-sm rounded px-3 py-1 border hover:bg-slate-50"
         >
           Edit

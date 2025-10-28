@@ -2,11 +2,13 @@ import { getStoryById } from "@/lib/story";
 import { getCharactersByStoryId } from "@/lib/character";
 import { getEpisodesByStoryId } from "@/lib/episode";
 import { notFound } from "next/navigation";
-import { StoryViewClient } from "./story-view-client";
+import { EpisodeGeneratorClient } from "./episode-generator-client";
 
-type Props = { params: Promise<{ id: string }> };
+type Props = {
+  params: Promise<{ id: string }>;
+};
 
-export default async function StoryPage({ params }: Props) {
+export default async function EpisodeGeneratorPage({ params }: Props) {
   const { id } = await params;
 
   const [story, characters, episodes] = await Promise.all([
@@ -19,5 +21,11 @@ export default async function StoryPage({ params }: Props) {
     notFound();
   }
 
-  return <StoryViewClient story={story} characters={characters} episodes={episodes} />;
+  return (
+    <EpisodeGeneratorClient
+      story={story}
+      characters={characters}
+      episodes={episodes}
+    />
+  );
 }

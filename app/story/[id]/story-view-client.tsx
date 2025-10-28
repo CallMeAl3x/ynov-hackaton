@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Book, Users, Info, Trash2, Edit } from "lucide-react";
+import { Book, Users, Info, Trash2, Edit, FileText } from "lucide-react";
 import { deleteStory } from "@/actions/delete-story";
 import { deleteCharacter } from "@/actions/delete-character";
 import { EditStoryModal } from "./edit-story-modal";
@@ -36,17 +36,32 @@ type Story = {
   updatedAt: Date;
 };
 
+type Episode = {
+  id: string;
+  name: string;
+  content: string;
+  order: number;
+  published: boolean;
+  storyId: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 interface StoryViewClientProps {
   story: Story;
   characters: Character[];
+  episodes: Episode[];
 }
 
 export function StoryViewClient({
   story,
   characters: initialCharacters,
+  episodes: initialEpisodes,
 }: StoryViewClientProps) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<"info" | "characters">("info");
+  const [activeTab, setActiveTab] = useState<
+    "info" | "characters" | "episodes"
+  >("info");
   const [isDeleting, setIsDeleting] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateCharacterModalOpen, setIsCreateCharacterModalOpen] =
@@ -133,7 +148,7 @@ export function StoryViewClient({
       )}
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 mb-8 border-b border-gray-200">
+      <div className="flex gap-1 mb-8 border-b border-gray-200 overflow-auto">
         <button
           onClick={() => setActiveTab("info")}
           className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors ${
@@ -155,6 +170,17 @@ export function StoryViewClient({
         >
           <Users className="w-5 h-5" />
           Characters {characters.length > 0 && `(${characters.length})`}
+        </button>
+        <button
+          onClick={() => setActiveTab("episodes")}
+          className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors ${
+            activeTab === "episodes"
+              ? "text-sky-600 border-b-2 border-sky-600"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          <FileText className="w-5 h-5" />
+          Épisodes {initialEpisodes.length > 0 && `(${initialEpisodes.length})`}
         </button>
       </div>
 
@@ -215,34 +241,20 @@ export function StoryViewClient({
                 </div>
               </div>
             </Card>
-
-            {/* JSON Debug Card */}
-            <Card className="p-6 bg-gray-50">
-              <h3 className="text-sm font-medium text-gray-600 mb-3">
-                Raw Data
-              </h3>
-              <pre className="text-xs overflow-auto max-h-96 text-gray-800">
-                {JSON.stringify(story, null, 2)}
-              </pre>
-            </Card>
           </div>
         )}
 
         {/* Characters Tab */}
         {activeTab === "characters" && (
           <div className="space-y-4 flex justify-end flex-col gap-2">
-            <button
-              onClick={() => setIsCreateCharacterModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-md bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700 transition-colors w-fit ml-auto"
-            >
-              + New Character
-            </button>
             {characters.length > 0 ? (
               characters.map((character) => (
                 <Card
                   key={character.id}
                   className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
-                  onClick={() => router.push(`/story/${story.id}/character/${character.id}`)}
+                  onClick={() =>
+                    router.push(`/story/${story.id}/character/${character.id}`)
+                  }
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -322,26 +334,141 @@ export function StoryViewClient({
             )}
           </div>
         )}
+
+        {/* Episodes Tab */}
+        {activeTab === "episodes" && (
+          <div className="space-y-4">
+            {initialEpisodes.length > 0 ? (
+              <div className="flex flex-col gap-4">
+                {initialEpisodes.map((episode) => (
+                  <Link key={episode.id} href={`/episode/${episode.id}`}>
+                    <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded">
+                              Épisode {episode.order}
+                            </span>
+                            {!episode.published && (
+                              <Badge className="bg-yellow-100 text-yellow-800">
+                                Brouillon
+                              </Badge>
+                            )}
+                            {episode.published && (
+                              <Badge className="bg-green-100 text-green-800">
+                                Publié
+                              </Badge>
+                            )}
+                          </div>
+                          <h3 className="text-lg font-semibold text-gray-900 mt-2">
+                            {episode.name}
+                          </h3>
+                          <p className="mt-3 text-gray-700 text-sm leading-relaxed line-clamp-3">
+                            {episode.content}
+                          </p>
+                          <p className="mt-3 text-xs text-gray-500">
+                            Créé le{" "}
+                            {typeof episode.createdAt === "string"
+                              ? new Date(episode.createdAt).toLocaleDateString(
+                                  "fr-FR"
+                                )
+                              : episode.createdAt.toLocaleDateString("fr-FR")}
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <Card className="p-12 text-center">
+                <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-600 mb-4">
+                  Aucun épisode pour le moment
+                </p>
+              </Card>
+            )}
+          </div>
+        )}
       </div>
 
-      {/* Footer Actions */}
-      <div className="flex gap-3 pt-6 border-t border-gray-200">
-        <button
-          onClick={() => setIsEditModalOpen(true)}
-          className="inline-flex items-center gap-2 rounded-md border border-slate-200 px-6 py-2 text-sm font-medium hover:bg-slate-50 transition-colors"
-        >
-          <Edit className="w-4 h-4" />
-          Edit
-        </button>
+      {/* Footer Actions - Context Aware */}
+      <div className="mt-12 pt-8 border-t border-gray-200">
+        <div className="space-y-4">
+          {/* Story Info Tab Footer */}
+          {activeTab === "info" && (
+            <>
+              <div>
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                  Actions
+                </h3>
+                <div className="flex gap-3 flex-wrap">
+                  <button
+                    onClick={() => setIsEditModalOpen(true)}
+                    className="inline-flex items-center gap-2 rounded-md bg-sky-600 px-6 py-2 text-sm font-medium text-white hover:bg-sky-700 transition-colors"
+                  >
+                    <Edit className="w-4 h-4" />
+                    Modifier l'histoire
+                  </button>
 
-        <button
-          onClick={handleDelete}
-          disabled={isDeleting}
-          className="inline-flex items-center gap-2 rounded-md bg-red-600 px-6 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Trash2 className="w-4 h-4" />
-          {isDeleting ? "Deleting..." : "Delete"}
-        </button>
+                  <Link
+                    href={`/story/${story.id}/episodes`}
+                    className="inline-flex items-center gap-2 rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Créer un épisode
+                  </Link>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-red-600 mb-3">
+                  Danger
+                </h3>
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="inline-flex items-center gap-2 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  {isDeleting ? "Suppression..." : "Supprimer l'histoire"}
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* Characters Tab Footer */}
+          {activeTab === "characters" && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                Actions
+              </h3>
+              <div className="flex gap-3 flex-wrap">
+                <button
+                  onClick={() => setIsCreateCharacterModalOpen(true)}
+                  className="inline-flex items-center gap-2 rounded-md bg-sky-600 px-6 py-2 text-sm font-medium text-white hover:bg-sky-700 transition-colors"
+                >
+                  Ajouter un personnage
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Episodes Tab Footer */}
+          {activeTab === "episodes" && (
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                Actions
+              </h3>
+              <Link
+                href={`/story/${story.id}/episodes`}
+                className="inline-flex items-center gap-2 rounded-md bg-sky-600 px-6 py-2 text-sm font-medium text-white hover:bg-sky-700 transition-colors"
+              >
+                <FileText className="w-4 h-4" />
+                Créer un nouvel épisode
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
 
       <EditStoryModal
@@ -350,6 +477,8 @@ export function StoryViewClient({
         storyId={story.id}
         initialName={storyData.name}
         initialTheme={storyData.theme}
+        initialSubject={story.subject}
+        initialDescription={story.description || ""}
         onSuccess={(updatedData) => {
           setStoryData(updatedData);
         }}
