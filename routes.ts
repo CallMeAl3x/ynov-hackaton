@@ -6,6 +6,9 @@ export const publicRoutes = [
   "/onboarding",
   "/onboarding/new",
   "/api/ollama",
+  "/community",
+  "/story/*",
+  "/episode/*",
 ];
 
 export const authRoutes = ["/auth/register", "/auth/login", "/auth/error"];

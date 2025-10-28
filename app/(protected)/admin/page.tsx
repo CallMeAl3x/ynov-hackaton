@@ -1,10 +1,4 @@
-import { Metadata } from "next";
 "use client";
-
-export const metadata: Metadata = {
-  title: "Admin Dashboard - Pensaga",
-  description: "Pensaga administration panel.",
-};
 
 import { RoleGate } from "@/components/auth/role-gate";
 import { FormSuccess } from "@/components/form-success";

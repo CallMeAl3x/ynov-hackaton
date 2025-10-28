@@ -1,10 +1,4 @@
-import { Metadata } from "next";
 "use client";
-
-export const metadata: Metadata = {
-  title: "Onboarding - Pensaga",
-  description: "Welcome to Pensaga! Get started with your first story.",
-};
 
 import { useRouter } from "next/navigation";
 import { ControlLevelChoice } from "@/components/onboarding/control-level-choice";

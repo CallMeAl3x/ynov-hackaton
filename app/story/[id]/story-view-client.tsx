@@ -380,9 +380,9 @@ export function StoryViewClient({
       const options = {
         margin: 10,
         filename: `${episode.name}.pdf`,
-        image: { type: "jpeg", quality: 0.98 },
+        image: { type: "png" as const, quality: 0.98 },
         html2canvas: { scale: 2 },
-        jsPDF: { orientation: "portrait", unit: "mm", format: "a4" },
+        jsPDF: { orientation: "portrait" as const, unit: "mm", format: "a4" },
       };
 
       html2pdf().set(options).from(element).save();

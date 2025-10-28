@@ -1,4 +1,3 @@
-import { Metadata } from "next";
 "use client";
 import { settings } from "@/actions/settings";
 import { FormError } from "@/components/form-error";
@@ -19,11 +18,6 @@ import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import QRCode from "react-qr-code"; // Import react-qr-code
 import * as z from "zod";
-
-export const metadata: Metadata = {
-  title: "Settings - Pensaga",
-  description: "Manage your Pensaga account settings.",
-};
 
 const SettingPage = () => {
   const user = useCurrentUser();

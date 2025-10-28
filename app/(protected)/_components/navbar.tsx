@@ -55,7 +55,7 @@ export const Navbar = () => {
 
           {/* Right: XP + Coins + Mobile burger */}
           <div className="flex items-center gap-2 sm:gap-4">
-            {user && (
+            {user ? (
               <>
                 {/* XP Bar with Level - Hidden on very small screens */}
                 <div className="hidden sm:flex">
@@ -78,6 +78,13 @@ export const Navbar = () => {
                   {user && <UserButton />}
                 </div>
               </>
+            ) : (
+              <a
+                href="/auth/signin"
+                className="px-4 py-2 text-sm md:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Se connecter
+              </a>
             )}
 
             {/* Burger (mobile) */}

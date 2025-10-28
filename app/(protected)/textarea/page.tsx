@@ -1,10 +1,4 @@
-import { Metadata } from "next";
 "use client";
-
-export const metadata: Metadata = {
-  title: "Ollama Test - Pensaga",
-  description: "Test Ollama API integration with prompts.",
-};
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
