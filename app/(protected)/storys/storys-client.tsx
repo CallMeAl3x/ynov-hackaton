@@ -90,7 +90,7 @@ export function StorysClient({ stories }: StorysClientProps) {
             <span className="text-xs text-gray-500">{formatDate(story.createdAt)}</span>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Link href={`/story/${story.id}`} className="flex-1">
               <Button variant="outline" className="w-full" size="sm">
                 <BookOpen className="w-4 h-4 mr-1" />

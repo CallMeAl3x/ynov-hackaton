@@ -15,7 +15,7 @@ export default async function OnBoardingNew({ searchParams }: Props) {
     : params?.type;
 
   const creationType =
-    type === "ai-guided" || type === "manual" ? type : "manual";
+    type === "ai-guided" || type === "manual" ? type : null;
 
   return (
     <OnboardingNewWrapper

@@ -6,7 +6,7 @@ import { getStoryByUserId } from "@/lib/story";
 export default async function ProfilePage() {
   const user = await currentUser();
 
-  if (!user) {
+  if (!user || !user.id) {
     redirect("/auth/login");
   }
 
@@ -14,7 +14,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
-      <ProfileClient user={user} stories={stories} />
+      <ProfileClient user={user as any} stories={stories} />
     </div>
   );
 }

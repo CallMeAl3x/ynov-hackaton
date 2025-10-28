@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Github, Twitter, Mail } from "lucide-react";
+import Image from "next/image";
 
 export const Footer = () => {
   return (
@@ -10,7 +11,13 @@ export const Footer = () => {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                <span className="text-black font-bold text-sm">WF</span>
+                <Image
+                  src="/Pensaga.png"
+                  alt="Mon logo"
+                  width={32}
+                  height={32}
+                  className="rounded-lg"
+                />
               </div>
               <span className="font-bold text-xl text-white">
                 Webnovel Factory
@@ -27,10 +34,7 @@ export const Footer = () => {
             <h3 className="font-semibold text-white mb-4">Produit</h3>
             <ul className="space-y-2">
               <li>
-                <Link
-                  href="#features"
-                  className="hover:text-white transition"
-                >
+                <Link href="#features" className="hover:text-white transition">
                   Fonctionnalités
                 </Link>
               </li>

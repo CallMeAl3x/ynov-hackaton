@@ -10,9 +10,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { createEpisode } from "@/actions/create-episode";
+import { generateEpisodeWithAI } from "@/actions/generate-episode";
 import { buildEpisodePrompt } from "@/lib/prompts";
+import { getRoleLabel, getRoleBadgeColor } from "@/lib/role-utils";
 import { MarkdownPreview } from "./markdown-preview";
-import { ArrowLeft, Sparkles, Loader } from "lucide-react";
+import { ArrowLeft, Sparkles, Loader, ChevronDown, ChevronUp } from "lucide-react";
 
 type Character = {
   id: string;
@@ -68,6 +70,8 @@ export function EpisodeGeneratorClient({
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showGuidance, setShowGuidance] = useState(false);
+  const [guidancePrompt, setGuidancePrompt] = useState("");
 
   const countWords = (text: string): number => {
     return text
@@ -83,65 +87,31 @@ export function EpisodeGeneratorClient({
     setEpisodeContent("");
 
     try {
-      const prompt = buildEpisodePrompt(story, characters, episodes);
-      const response = await fetch("/api/ollama", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, maxWords: 2500, stream: true }),
-      });
+      const result = await generateEpisodeWithAI(
+        story,
+        characters,
+        episodes,
+        guidancePrompt || undefined
+      );
 
-      if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
-      }
+      if (result.success && result.content) {
+        setEpisodeContent(result.content);
+        const wordCount = countWords(result.content);
 
-      if (!response.body) {
-        throw new Error("No response body");
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let fullContent = "";
-
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split("\n");
-
-          for (const line of lines) {
-            if (!line.trim()) continue;
-
-            try {
-              const parsed = JSON.parse(line);
-              const text = parsed.message?.content || "";
-              if (text) {
-                fullContent += text;
-                setEpisodeContent(fullContent);
-              }
-            } catch (e) {
-              // Skip invalid JSON lines
-            }
-          }
+        if (wordCount > 2500) {
+          setError(
+            `Le contenu généré dépasse la limite de 2500 mots (${wordCount} mots générés). Veuillez réduire ou régénérer.`
+          );
+          setEpisodeContent("");
+          setIsGenerating(false);
+          return;
         }
-      } finally {
-        reader.releaseLock();
-      }
 
-      if (!fullContent.trim()) {
-        throw new Error("Pas de contenu généré");
-      }
-
-      const wordCount = countWords(fullContent);
-
-      if (wordCount > 2500) {
-        setError(
-          `Le contenu généré dépasse la limite de 2500 mots (${wordCount} mots générés). Veuillez réduire ou régénérer.`
-        );
+        setSuccess("Épisode généré avec succès!");
+        setShowGuidance(false);
+      } else {
+        setError(result.error || "Erreur lors de la génération");
         setEpisodeContent("");
-        setIsGenerating(false);
-        return;
       }
     } catch (err) {
       const errorMsg =
@@ -231,8 +201,8 @@ export function EpisodeGeneratorClient({
             <div className="space-y-2">
               {characters.map((char) => (
                 <div key={char.id} className="flex items-start gap-2">
-                  <Badge className="capitalize flex-shrink-0 mt-1">
-                    {char.role}
+                  <Badge variant="outline" className={`flex-shrink-0 mt-1 ${getRoleBadgeColor(char.role)}`}>
+                    {getRoleLabel(char.role)}
                   </Badge>
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{char.name}</p>
@@ -300,31 +270,80 @@ export function EpisodeGeneratorClient({
             </div>
           )}
 
-          {/* Actions */}
-          <div className="flex gap-3 flex-wrap">
+          {/* Guidance Section */}
+          <div className="border border-gray-200 rounded-lg bg-gray-50 mt-4">
+            <button
+              onClick={() => setShowGuidance(!showGuidance)}
+              className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-100 transition-colors"
+              disabled={isGenerating}
+            >
+              <span className="font-medium text-gray-900">
+                {showGuidance ? "Masquer" : "Afficher"} les options de génération
+              </span>
+              {showGuidance ? (
+                <ChevronUp className="w-5 h-5 text-gray-600" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-600" />
+              )}
+            </button>
+
+            {showGuidance && (
+              <div className="px-4 pb-4 border-t border-gray-200 space-y-3">
+                <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-800">
+                  <p className="font-semibold mb-1">Comment guider la génération ?</p>
+                  <ul className="space-y-1 text-xs ml-4 list-disc">
+                    <li><strong>Aucun texte :</strong> L'IA générera librement basée sur votre histoire</li>
+                    <li><strong>Avec guidage :</strong> Ex: "La protagoniste rencontre un mentor mystérieux"</li>
+                    <li><strong>Spécifique :</strong> Ex: "Focus sur le combat final avec dialogue dramatique"</li>
+                  </ul>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="guidance">Guidage optionnel pour la génération</Label>
+                  <Textarea
+                    id="guidance"
+                    value={guidancePrompt}
+                    onChange={(e) => setGuidancePrompt(e.target.value)}
+                    placeholder="Décrivez ce que vous aimeriez voir dans cet épisode... (optionnel)"
+                    disabled={isGenerating}
+                    rows={3}
+                    className="resize-none"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Laissez vide pour une génération complètement libre
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Actions - Mobile optimized */}
+          <div className="grid grid-cols-1 sm:flex sm:gap-3 sm:flex-wrap gap-2 pt-4 border-t border-gray-200">
             <Button
               onClick={handleGenerateWithAI}
               disabled={isGenerating}
-              className="inline-flex items-center gap-2"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white py-3 sm:py-2 font-medium"
             >
               {isGenerating ? (
                 <Loader className="w-4 h-4 animate-spin" />
               ) : (
                 <Sparkles className="w-4 h-4" />
               )}
-              {isGenerating ? "Génération..." : "Générer avec l'IA"}
+              <span>{isGenerating ? "Génération..." : "Générer"}</span>
             </Button>
 
             <Button
               onClick={handleSaveEpisode}
               disabled={isGenerating || !episodeContent.trim()}
-              className="bg-sky-600 hover:bg-sky-700"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 bg-sky-600 hover:bg-sky-700 text-white py-3 sm:py-2 font-medium"
             >
-              Sauvegarder l'épisode
+              Sauvegarder
             </Button>
 
-            <Link href={`/story/${story.id}`}>
-              <Button variant="outline">Annuler</Button>
+            <Link href={`/story/${story.id}`} className="w-full sm:w-auto">
+              <Button variant="outline" className="w-full flex items-center justify-center py-3 sm:py-2 font-medium">
+                Annuler
+              </Button>
             </Link>
           </div>
         </div>

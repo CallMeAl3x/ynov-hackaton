@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { updateCharacter } from "@/actions/update-character";
+import { ROLE_OPTIONS } from "@/lib/role-utils";
 import {
   Dialog,
   DialogContent,
@@ -20,13 +21,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const ROLES = [
-  { value: "PROTAGONIST", label: "Protagonist" },
-  { value: "ANTAGONIST", label: "Antagonist" },
-  { value: "SECONDARY", label: "Secondary" },
-  { value: "MINOR", label: "Minor" },
-];
 
 interface EditCharacterModalProps {
   open: boolean;
@@ -79,17 +73,17 @@ export function EditCharacterModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Edit Character</DialogTitle>
+          <DialogTitle>Éditer le personnage</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Character Name</Label>
+            <Label htmlFor="name">Nom du personnage</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter character name"
+              placeholder="Entrez le nom du personnage"
               disabled={isLoading}
               required
             />
@@ -101,7 +95,7 @@ export function EditCharacterModal({
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter character description"
+              placeholder="Entrez la description du personnage"
               disabled={isLoading}
               required
               rows={4}
@@ -109,13 +103,13 @@ export function EditCharacterModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="role">Role</Label>
+            <Label htmlFor="role">Rôle</Label>
             <Select value={role} onValueChange={setRole} disabled={isLoading}>
               <SelectTrigger id="role">
-                <SelectValue placeholder="Select a role" />
+                <SelectValue placeholder="Sélectionnez un rôle" />
               </SelectTrigger>
               <SelectContent>
-                {ROLES.map((r) => (
+                {ROLE_OPTIONS.map((r) => (
                   <SelectItem key={r.value} value={r.value}>
                     {r.label}
                   </SelectItem>
@@ -133,10 +127,10 @@ export function EditCharacterModal({
               onClick={() => onOpenChange(false)}
               disabled={isLoading}
             >
-              Cancel
+              Annuler
             </Button>
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Saving..." : "Save"}
+              {isLoading ? "Sauvegarde en cours..." : "Enregistrer"}
             </Button>
           </DialogFooter>
         </form>

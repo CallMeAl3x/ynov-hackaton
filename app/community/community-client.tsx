@@ -38,9 +38,10 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [expandedUser, setExpandedUser] = useState<string | null>(null);
 
-  const filteredUsers = initialUsers.filter((user) =>
-    user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredUsers = initialUsers.filter(
+    (user) =>
+      user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -53,8 +54,8 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
             <h1 className="text-3xl font-bold text-gray-900">Communauté</h1>
           </div>
           <p className="text-gray-600">
-            Découvrez les histoires des {filteredUsers.length}{" "}
-            auteur{filteredUsers.length > 1 ? "s" : ""} de la communauté
+            Découvrez les histoires des {filteredUsers.length} auteur
+            {filteredUsers.length > 1 ? "s" : ""} de la communauté
           </p>
         </div>
       </header>
@@ -83,7 +84,7 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
                     setExpandedUser(expandedUser === user.id ? null : user.id)
                   }
                 >
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start justify-between mb-4 flex-col gap-3 sm:flex-row">
                     <div>
                       <h2 className="text-xl font-semibold text-gray-900">
                         {user.name || "Utilisateur anonyme"}
@@ -158,7 +159,9 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
                         </Link>
                       ))
                     ) : (
-                      <p className="text-sm text-gray-600">Aucune histoire publiée</p>
+                      <p className="text-sm text-gray-600">
+                        Aucune histoire publiée
+                      </p>
                     )}
                   </div>
                 )}
@@ -182,7 +185,7 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
 
       {/* Stats Footer */}
       {filteredUsers.length > 0 && (
-        <div className="max-w-6xl mx-auto px-4 py-12 border-t border-gray-200 mt-8">
+        <div className="max-w-6xl mx-auto px-4 py-6 border-t border-gray-200 mt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="p-6 bg-blue-50 border-blue-200">
               <p className="text-sm font-medium text-blue-600 mb-2">
@@ -197,7 +200,10 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
                 Histoires publiées
               </p>
               <p className="text-3xl font-bold text-green-900">
-                {filteredUsers.reduce((sum, user) => sum + user.stories.length, 0)}
+                {filteredUsers.reduce(
+                  (sum, user) => sum + user.stories.length,
+                  0
+                )}
               </p>
             </Card>
             <Card className="p-6 bg-purple-50 border-purple-200">
@@ -208,7 +214,10 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
                 {filteredUsers.reduce(
                   (sum, user) =>
                     sum +
-                    user.stories.reduce((s, story) => s + story._count.characters, 0),
+                    user.stories.reduce(
+                      (s, story) => s + story._count.characters,
+                      0
+                    ),
                   0
                 )}
               </p>

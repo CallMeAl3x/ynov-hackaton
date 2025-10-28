@@ -1,3 +1,5 @@
+import { getRoleLabel } from "./role-utils";
+
 type Character = {
   id: string;
   name: string;
@@ -41,7 +43,7 @@ export function buildEpisodePrompt(
   const charactersList = characters
     .map(
       (c) =>
-        `- ${c.name} (${c.role}): ${c.description}${c.relationships ? ` - Relationships: ${c.relationships}` : ""}`
+        `- ${c.name} (${getRoleLabel(c.role)}): ${c.description}${c.relationships ? ` - Relations: ${c.relationships}` : ""}`
     )
     .join("\n");
 
@@ -61,7 +63,7 @@ CONTEXTE ACTUEL:
 ${episodes.length > 0 ? `Dernier épisode résumé: "${episodes[episodes.length - 1].name}\n${episodes[episodes.length - 1].content.substring(0, 300)}..."` : "Ceci est le premier épisode"}
 
 INSTRUCTIONS:
-1. Écris un épisode de 1500 à 2500 mots MAXIMUM au format MARKDOWN
+1. Écris un épisode de 1500 à 2500 mots MAXIMUM au format MARKDOWN en FRANÇAIS
 2. Respecte ABSOLUMENT la limite de 2500 mots
 3. Reprends les personnages mentionnés et développe l'histoire
 4. Respecte le thème "${story.theme}" et l'intrigue

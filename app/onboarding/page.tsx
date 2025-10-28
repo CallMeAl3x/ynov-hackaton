@@ -12,15 +12,15 @@ const OnBoarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-4 px-4">
+    <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white py-4 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-4xl font-bold text-center mb-2">
-            Create Your First Story
+          <h1 className="text-4xl font-bold text-center mb-2 text-gray-900">
+            Créez Votre Première Histoire
           </h1>
           <p className="text-center text-gray-600 max-w-2xl mx-auto">
-            How much control do you want over your story creation?
+            Quel niveau de contrôle souhaitez-vous sur la création de votre histoire ?
           </p>
         </div>
 
@@ -30,8 +30,7 @@ const OnBoarding = () => {
         {/* Footer Info */}
         <div className="mt-12 text-center text-gray-500 text-sm">
           <p>
-            No account needed to create. You can save your story after you're
-            done.
+            Aucun compte nécessaire pour créer. Vous pouvez enregistrer votre histoire une fois terminée.
           </p>
         </div>
       </div>

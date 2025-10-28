@@ -8,7 +8,7 @@ import { RegisterSchema } from "@/schemas";
 import bycript from "bcryptjs";
 import * as z from "zod";
 
-export const register = async (values: z.infer<typeof RegisterSchema>) => {
+export const register = async (values: z.infer<typeof RegisterSchema>, callbackUrl?: string | null) => {
   const validatedFields = RegisterSchema.safeParse(values);
 
   if (!validatedFields.success) {
@@ -34,7 +34,9 @@ export const register = async (values: z.infer<typeof RegisterSchema>) => {
 
   const verificationToken = await generateVerificationToken(email);
 
-  sendVerificationEmail(verificationToken.email, verificationToken.token);
+  // Include callback URL in verification email if provided
+  const callbackUrlParam = callbackUrl ? `?callbackUrl=${encodeURIComponent(callbackUrl)}` : "";
+  sendVerificationEmail(verificationToken.email, verificationToken.token, callbackUrlParam);
 
   return { success: "Comfirmation email sent !" };
 };

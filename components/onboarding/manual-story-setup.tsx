@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { StoryBasicSchema } from "@/schemas";
-import { Loader2, ArrowLeft, Sliders, Check } from "lucide-react";
+import { Loader2, ArrowLeft, Sliders, Check, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createStory } from "@/actions/create-story";
 
@@ -22,15 +22,16 @@ interface ManualStorySetupProps {
   isAuthenticated?: boolean;
 }
 
-const THEMES = [
-  { label: "Fantasy", value: "fantasy" },
-  { label: "Science Fiction", value: "sci-fi" },
+const PREDEFINED_THEMES = [
+  { label: "Fantaisie", value: "fantasy" },
+  { label: "Science-Fiction", value: "sci-fi" },
   { label: "Romance", value: "romance" },
-  { label: "Mystery", value: "mystery" },
-  { label: "Horror", value: "horror" },
-  { label: "Adventure", value: "adventure" },
-  { label: "Drama", value: "drama" },
-  { label: "Other", value: "other" }
+  { label: "Mystère", value: "mystery" },
+  { label: "Horreur", value: "horror" },
+  { label: "Aventure", value: "adventure" },
+  { label: "Drame", value: "drama" },
+  { label: "Autre", value: "other" },
+  { label: "Non défini", value: "undefined" }
 ];
 
 export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = false }: ManualStorySetupProps) => {
@@ -39,6 +40,8 @@ export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = fal
   const [success, setSuccess] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [customTheme, setCustomTheme] = useState<string>("");
+  const [showCustomTheme, setShowCustomTheme] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof StoryBasicSchema>>({
     resolver: zodResolver(StoryBasicSchema),
@@ -78,25 +81,36 @@ export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = fal
       return;
     }
 
+    // Get final theme value
+    const finalTheme = showCustomTheme ? customTheme : values.theme;
+
+    if (!finalTheme || !finalTheme.trim()) {
+      setError("Veuillez sélectionner ou entrer un thème");
+      return;
+    }
+
     setError("");
     setSuccess("");
     setIsLoading(true);
 
     try {
+      // Update values with final theme
+      const finalValues = { ...values, theme: finalTheme };
+
       // If not authenticated, redirect to signup with story data in state
       if (!isAuthenticated) {
         // Store form data in localStorage for recovery after signup
-        localStorage.setItem("storyDraft", JSON.stringify(values));
+        localStorage.setItem("storyDraft", JSON.stringify(finalValues));
         router.push("/auth/register");
         return;
       }
 
       // Call the create story server action
-      const result = await createStory(values);
+      const result = await createStory(finalValues);
 
       if (result.error === "LOGIN_REQUIRED") {
         // Store form data and redirect to signup
-        localStorage.setItem("storyDraft", JSON.stringify(values));
+        localStorage.setItem("storyDraft", JSON.stringify(finalValues));
         router.push("/auth/register");
         return;
       }
@@ -106,7 +120,7 @@ export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = fal
         return;
       }
 
-      setSuccess("Story created successfully! Redirecting...");
+      setSuccess("Histoire créée avec succès! Redirection...");
       if (result.storyId) {
         setTimeout(() => {
           onStoryCreated(result.storyId);
@@ -114,10 +128,20 @@ export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = fal
       }
 
     } catch (err) {
-      setError("Failed to create story. Please try again.");
+      setError("Erreur lors de la création de l'histoire. Veuillez réessayer.");
       console.error(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleThemeChange = (theme: string) => {
+    form.setValue("theme", theme);
+    if (theme === "custom") {
+      setShowCustomTheme(true);
+    } else {
+      setShowCustomTheme(false);
+      setCustomTheme("");
     }
   };
 
@@ -128,7 +152,7 @@ export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = fal
   };
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
+    <div className="space-y-4 md:space-y-6 max-w-2xl mx-auto px-4 md:px-0">
       <div className="flex items-center gap-2">
         <Button
           variant="outline"
@@ -138,24 +162,24 @@ export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = fal
           className="gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back
+          Retour
         </Button>
       </div>
 
       {/* Progress Indicator */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-1 md:gap-3">
         {[1, 2, 3].map((s) => (
           <div key={s} className="flex items-center gap-3">
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold transition-colors ${
+              className={`w-6 md:w-8 h-6 md:h-8 rounded-full flex items-center justify-center font-semibold transition-colors text-xs md:text-sm ${
                 s < step
                   ? "bg-green-600 text-white"
                   : s === step
-                  ? "bg-purple-600 text-white"
+                  ? "bg-sky-600 text-white"
                   : "bg-gray-200 text-gray-600"
               }`}
             >
-              {s < step ? <Check className="w-4 h-4" /> : s}
+              {s < step ? <Check className="w-3 md:w-4 h-3 md:h-4" /> : s}
             </div>
             {s < 3 && (
               <div
@@ -168,13 +192,13 @@ export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = fal
         ))}
       </div>
 
-      <Card className="p-8 bg-gradient-to-br from-blue-50 to-transparent">
-        <div className="space-y-2 mb-6">
+      <Card className="p-6 md:p-8 bg-gradient-to-br from-sky-50 to-transparent">
+        <div className="space-y-2 mb-4 md:mb-6">
           <div className="flex items-center gap-2">
-            <Sliders className="w-6 h-6 text-blue-600" />
-            <h2 className="text-2xl font-bold">Create Your Story</h2>
+            <Sliders className="w-5 md:w-6 h-5 md:h-6 text-sky-600" />
+            <h2 className="text-xl md:text-2xl font-bold text-gray-900">Créez Votre Histoire</h2>
           </div>
-          <p className="text-gray-600">Step {step} of 3</p>
+          <p className="text-sm md:text-base text-gray-600">Étape {step} sur 3</p>
         </div>
 
         <form
@@ -182,19 +206,20 @@ export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = fal
             e.preventDefault();
             // Ne rien faire ici - la soumission se fait via le bouton
           }}
-          className="space-y-6"
+          className="space-y-4 md:space-y-6"
         >
           {/* Step 1: Title and Theme */}
           {step === 1 && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-base font-semibold">
-                  Story Title
+                <Label htmlFor="name" className="text-sm md:text-base font-semibold">
+                  Titre de l'Histoire
                 </Label>
                 <Input
                   id="name"
-                  placeholder="e.g., The Last Kingdom"
+                  placeholder="Par exemple : Le Dernier Royaume"
                   disabled={isLoading}
+                  className="text-sm md:text-base"
                   {...form.register("name")}
                 />
                 {form.formState.errors.name && (
@@ -203,23 +228,62 @@ export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = fal
               </div>
 
               <div className="space-y-2">
-                <Label className="text-base font-semibold">Choose a Theme</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {THEMES.map((theme) => (
+                <Label className="text-sm md:text-base font-semibold">Choisir un Thème</Label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {PREDEFINED_THEMES.map((theme) => (
                     <button
                       key={theme.value}
                       type="button"
-                      onClick={() => form.setValue("theme", theme.value)}
-                      className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
-                        form.watch("theme") === theme.value
-                          ? "border-blue-600 bg-blue-50"
-                          : "border-gray-200 hover:border-blue-300"
+                      onClick={() => handleThemeChange(theme.value)}
+                      className={`p-2 md:p-3 rounded-lg border-2 transition-all text-xs md:text-sm font-medium ${
+                        form.watch("theme") === theme.value && !showCustomTheme
+                          ? "border-sky-600 bg-sky-50"
+                          : "border-gray-200 hover:border-sky-300"
                       }`}
                     >
                       {theme.label}
                     </button>
                   ))}
+                  <button
+                    type="button"
+                    onClick={() => handleThemeChange("custom")}
+                    className={`p-2 md:p-3 rounded-lg border-2 transition-all text-xs md:text-sm font-medium ${
+                      showCustomTheme
+                        ? "border-sky-600 bg-sky-50"
+                        : "border-gray-200 hover:border-sky-300"
+                    }`}
+                  >
+                    Personnalisé
+                  </button>
                 </div>
+
+                {/* Custom Theme Input */}
+                {showCustomTheme && (
+                  <div className="mt-3 p-3 bg-white rounded-lg border border-sky-200 space-y-2">
+                    <Label htmlFor="custom-theme" className="text-xs md:text-sm font-medium">
+                      Entrez votre thème personnalisé
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="custom-theme"
+                        value={customTheme}
+                        onChange={(e) => setCustomTheme(e.target.value)}
+                        placeholder="Ex: Cyberpunk, Steampunk, etc."
+                        disabled={isLoading}
+                        className="flex-1 text-xs md:text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleThemeChange("other")}
+                        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Annuler le thème personnalisé"
+                      >
+                        <X className="w-4 h-4 md:w-5 md:h-5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {form.formState.errors.theme && (
                   <FormError message={form.formState.errors.theme.message} />
                 )}
@@ -230,16 +294,16 @@ export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = fal
           {/* Step 2: Story Subject/Plot */}
           {step === 2 && (
             <div className="space-y-2">
-              <Label htmlFor="subject" className="text-base font-semibold">
-                Story Subject & Plot
+              <Label htmlFor="subject" className="text-sm md:text-base font-semibold">
+                Sujet et Intrigue de l'Histoire
               </Label>
-              <p className="text-sm text-gray-500 mb-3">
-                Describe the main plot, setting, and key elements of your story.
+              <p className="text-xs md:text-sm text-gray-500 mb-3">
+                Décrivez l'intrigue principale, le décor et les éléments clés de votre histoire.
               </p>
               <Textarea
                 id="subject"
-                placeholder="e.g., In a dark medieval kingdom, a young peasant discovers they have the ability to control shadows. They must hide their power from the ruling class while a war is brewing..."
-                className="min-h-[150px] resize-none"
+                placeholder="Par exemple : Dans un sombre royaume médiéval, un jeune paysan découvre qu'il a le pouvoir de contrôler les ombres. Il doit cacher son pouvoir à la classe dirigeante tandis qu'une guerre se prépare..."
+                className="min-h-[120px] md:min-h-[150px] resize-none text-sm md:text-base"
                 disabled={isLoading}
                 {...form.register("subject")}
               />
@@ -252,16 +316,16 @@ export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = fal
           {/* Step 3: Description */}
           {step === 3 && (
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-base font-semibold">
-                Description (Optional)
+              <Label htmlFor="description" className="text-sm md:text-base font-semibold">
+                Description (Optionnelle)
               </Label>
-              <p className="text-sm text-gray-500 mb-3">
-                Add a short summary that will appear on your story's profile. This helps readers understand what your story is about.
+              <p className="text-xs md:text-sm text-gray-500 mb-3">
+                Ajoutez un court résumé qui apparaîtra sur le profil de votre histoire. Cela aide les lecteurs à comprendre de quoi parle votre histoire.
               </p>
               <Textarea
                 id="description"
-                placeholder="A brief description of your story for readers..."
-                className="min-h-[100px] resize-none"
+                placeholder="Une brève description de votre histoire pour les lecteurs..."
+                className="min-h-[100px] md:min-h-[120px] resize-none text-sm md:text-base"
                 disabled={isLoading}
                 {...form.register("description")}
               />
@@ -274,26 +338,26 @@ export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = fal
           {error && <FormError message={error} />}
           {success && <FormSuccess message={success} />}
 
-          <div className="flex gap-3">
+          <div className="flex gap-2 md:gap-3">
             {step > 1 && (
               <Button
                 type="button"
                 variant="outline"
                 onClick={handlePrevStep}
                 disabled={isLoading}
-                className="flex-1"
+                className="flex-1 text-sm md:text-base"
               >
-                Previous
+                Précédent
               </Button>
             )}
             {step < 3 ? (
               <Button
                 type="button"
                 onClick={handleNextClick}
-                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                className="flex-1 bg-sky-600 hover:bg-sky-700 text-sm md:text-base"
                 disabled={isLoading}
               >
-                Next
+                Suivant
               </Button>
             ) : (
               <Button
@@ -302,28 +366,28 @@ export const ManualStorySetup = ({ onBack, onStoryCreated, isAuthenticated = fal
                   const values = form.getValues();
                   await onSubmit(values);
                 }}
-                className="flex-1 bg-green-600 hover:bg-green-700"
+                className="flex-1 bg-green-600 hover:bg-green-700 text-sm md:text-base"
                 disabled={isLoading}
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creating...
+                    Création...
                   </>
                 ) : (
-                  "Create Story"
+                  "Créer l'Histoire"
                 )}
               </Button>
             )}
           </div>
         </form>
 
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-800">
-          <p className="font-semibold mb-2">What's next:</p>
+        <div className="mt-4 md:mt-6 bg-sky-50 border border-sky-200 rounded-lg p-3 md:p-4 text-xs md:text-sm text-sky-800">
+          <p className="font-semibold mb-2">Prochaines étapes :</p>
           <ul className="space-y-1 ml-4 list-disc">
-            <li>After creating your story, you'll set up main characters</li>
-            <li>Then you can write your first episode</li>
-            <li>You can always edit these details later</li>
+            <li>Après avoir créé votre histoire, vous configurerez les personnages principaux</li>
+            <li>Ensuite, vous pourrez écrire votre premier épisode</li>
+            <li>Vous pouvez toujours modifier ces détails plus tard</li>
           </ul>
         </div>
       </Card>

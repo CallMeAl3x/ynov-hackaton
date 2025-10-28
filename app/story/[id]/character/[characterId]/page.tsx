@@ -1,5 +1,6 @@
 import { getCharacterById } from "@/lib/character";
 import { getStoryById } from "@/lib/story";
+import { currentUser } from "@/lib/auth";
 import { notFound } from "next/navigation";
 import { CharacterDetailClient } from "./character-detail-client";
 
@@ -9,6 +10,7 @@ type Props = {
 
 export default async function CharacterPage({ params }: Props) {
   const { id, characterId } = await params;
+  const user = await currentUser();
 
   const [character, story] = await Promise.all([
     getCharacterById(characterId),
@@ -24,5 +26,14 @@ export default async function CharacterPage({ params }: Props) {
     notFound();
   }
 
-  return <CharacterDetailClient character={character} story={story} />;
+  // Check if current user is the story author
+  const isAuthor = user?.id === story.authorId;
+
+  return (
+    <CharacterDetailClient
+      character={character}
+      story={story}
+      isAuthor={isAuthor}
+    />
+  );
 }

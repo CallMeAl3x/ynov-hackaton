@@ -1,14 +1,14 @@
-import Navbar from "../(protected)/_components/navbar";
+import Navbar from "@/app/(protected)/_components/navbar";
 
 export default async function RootLayout({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <>
-    <Navbar/>
-    {children}
-    </>
+    <div>
+      <Navbar />
+      <main className="">{children}</main>
+    </div>
   );
 }

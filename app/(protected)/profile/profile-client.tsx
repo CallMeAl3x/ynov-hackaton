@@ -64,7 +64,7 @@ export function ProfileClient({ user, stories }: ProfileClientProps) {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-12">
+      <main className="max-w-6xl mx-auto px-4 py-6">
         {/* User Info Card */}
         <Card className="p-8 mb-8 bg-gradient-to-r from-sky-50 to-blue-50">
           <div className="flex items-start gap-6">
@@ -83,16 +83,28 @@ export function ProfileClient({ user, stories }: ProfileClientProps) {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Histoires publiées</p>
-                  <p className="text-2xl font-bold text-sky-600">{publishedStories.length}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Histoires publiées
+                  </p>
+                  <p className="text-2xl font-bold text-sky-600">
+                    {publishedStories.length}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Brouillons</p>
-                  <p className="text-2xl font-bold text-yellow-600">{draftStories.length}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Brouillons
+                  </p>
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {draftStories.length}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total d'histoires</p>
-                  <p className="text-2xl font-bold text-gray-900">{stories.length}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total d'histoires
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stories.length}
+                  </p>
                 </div>
               </div>
             </div>
@@ -100,7 +112,9 @@ export function ProfileClient({ user, stories }: ProfileClientProps) {
             <Button
               variant="outline"
               className="self-start"
-              onClick={() => alert("Fonctionnalité de modification du profil à venir")}
+              onClick={() =>
+                alert("Fonctionnalité de modification du profil à venir")
+              }
             >
               <Settings className="w-4 h-4 mr-2" />
               Modifier

@@ -147,7 +147,7 @@ export function EpisodePageClient({
               <h1 className="text-3xl font-bold text-gray-900">{title}</h1>
             </div>
             {isAuthor && (
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-8">
                 <Button
                   variant="outline"
                   size="sm"

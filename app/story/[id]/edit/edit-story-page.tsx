@@ -86,7 +86,7 @@ export function EditStoryPage({ story }: EditStoryPageProps) {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-12 px-4">
+    <div className="max-w-2xl mx-auto py-4 px-4">
       {/* Back Button */}
       <Link
         href={`/story/${story.id}`}
@@ -98,8 +98,12 @@ export function EditStoryPage({ story }: EditStoryPageProps) {
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Modifier l'histoire</h1>
-        <p className="mt-2 text-gray-600">Mettez à jour les informations de votre histoire</p>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Modifier l'histoire
+        </h1>
+        <p className="mt-2 text-gray-600">
+          Mettez à jour les informations de votre histoire
+        </p>
       </div>
 
       {/* Form */}
@@ -167,20 +171,26 @@ export function EditStoryPage({ story }: EditStoryPageProps) {
             maxLength={1000}
             rows={3}
           />
-          <p className="text-xs text-gray-500">
-            Maximum 1000 caractères
-          </p>
+          <p className="text-xs text-gray-500">Maximum 1000 caractères</p>
         </div>
 
         {/* Messages */}
-        {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded">{error}</div>}
-        {success && <div className="text-sm text-green-600 bg-green-50 p-3 rounded">{success}</div>}
+        {error && (
+          <div className="text-sm text-red-600 bg-red-50 p-3 rounded">
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="text-sm text-green-600 bg-green-50 p-3 rounded">
+            {success}
+          </div>
+        )}
 
         {/* Actions */}
-        <div className="flex gap-3 pt-6 border-t border-gray-200">
+        <div className="flex gap-3 pt-6 border-t border-gray-200 flex-col-reverse">
           <Link
             href={`/story/${story.id}`}
-            className="inline-flex items-center gap-2 rounded-md border border-slate-200 px-6 py-2 text-sm font-medium hover:bg-slate-50 transition-colors"
+            className="inline-flex justify-center items-center gap-2 rounded-md border border-slate-200 px-6 py-2 text-sm font-medium hover:bg-slate-50 transition-colors"
           >
             Annuler
           </Link>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { Button } from "@/components/ui/button";
 import { UserButton } from "@/components/auth/user-button";
+import Image from "next/image";
 
 export const LandingNavbar = () => {
   const user = useCurrentUser();
@@ -14,12 +15,13 @@ export const LandingNavbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">WF</span>
-            </div>
-            <span className="font-bold text-xl text-gray-900">
-              Webnovel Factory
-            </span>
+            <Image
+              src="/Pensaga.png"
+              alt="Mon logo"
+              width={32}
+              height={32}
+              className="rounded-lg"
+            />
           </Link>
 
           {/* Navigation Links */}

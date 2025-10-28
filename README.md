@@ -162,6 +162,8 @@ npx prisma db push
 
 # Optionnel : Ouvrir Prisma Studio pour visualiser les données
 npx prisma studio
+
+bun run prisma/seed.ts
 ```
 
 ### 5. Configuration d'Ollama

@@ -4,12 +4,11 @@ interface ProtectedLayoutProps {
   children: React.ReactNode;
 }
 
-
 const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
   return (
     <div>
-      <Navbar/>
-      {children}
+      <Navbar />
+      <main className="">{children}</main>
     </div>
   );
 };

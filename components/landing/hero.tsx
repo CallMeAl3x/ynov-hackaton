@@ -50,7 +50,7 @@ export const Hero = () => {
               </Link>
             ) : (
               <>
-                <Link href="/auth/register">
+                <Link href="/onboarding">
                   <Button
                     size="lg"
                     className="bg-black hover:bg-gray-800 text-white px-8 py-6 text-lg"

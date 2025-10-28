@@ -23,6 +23,9 @@ export const LoginForm = () => {
   const [success, setSuccess] = useState<string | undefined>("");
   const [showTwoFactor, setShowTwoFactor] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  const registerHref = callbackUrl ? `/auth/register?callbackUrl=${callbackUrl}` : "/auth/register";
+
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -61,7 +64,7 @@ export const LoginForm = () => {
     <CardWrapper
       headerLabel="Bienvenue"
       backButtonLabel="Pas encore de compte ? S'inscrire"
-      backButtonHref="/auth/register"
+      backButtonHref={registerHref}
       showSocial
     >
       <Form {...form}>

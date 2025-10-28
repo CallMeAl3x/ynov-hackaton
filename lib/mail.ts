@@ -12,8 +12,8 @@ export const sendTwoFactorTokenEmail = async (email: string, token: string) => {
   });
 };
 
-export const sendVerificationEmail = async (email: string, token: string) => {
-  const confirmLink = `${domain}/auth/new-verification?token=${token}`;
+export const sendVerificationEmail = async (email: string, token: string, callbackUrlParam: string = "") => {
+  const confirmLink = `${domain}/auth/new-verification?token=${token}${callbackUrlParam}`;
 
   await resend.emails.send({
     from: "onboarding@bonefons.com",

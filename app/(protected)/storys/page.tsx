@@ -23,14 +23,18 @@ const StorysPage = async () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
+      <header className="border-b border-gray-200 bg-white relative">
         <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-col sm:flex-row gap-4">
             <div className="flex items-center gap-3">
               <BookOpen className="w-8 h-8 text-sky-600" />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">Mes histoires</h1>
-                <p className="text-sm text-gray-600">Gérez et créez vos web novels</p>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Mes histoires
+                </h1>
+                <p className="text-sm text-gray-600">
+                  Gérez et créez vos web novels
+                </p>
               </div>
             </div>
             <Link href="/onboarding/new">
@@ -44,7 +48,7 @@ const StorysPage = async () => {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-12">
+      <main className="max-w-6xl mx-auto px-4 py-6">
         {storys.length === 0 ? (
           <Card className="p-16 text-center">
             <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -52,7 +56,8 @@ const StorysPage = async () => {
               Vous n'avez pas encore d'histoires
             </h2>
             <p className="text-gray-600 mb-6">
-              Créez votre première histoire et commencez à écrire votre web novel!
+              Créez votre première histoire et commencez à écrire votre web
+              novel!
             </p>
             <Link href="/onboarding/new">
               <Button className="bg-sky-600 hover:bg-sky-700">
@@ -64,7 +69,10 @@ const StorysPage = async () => {
           <div>
             <div className="mb-6">
               <p className="text-sm text-gray-600">
-                Vous avez <span className="font-semibold text-gray-900">{storys.length}</span>{" "}
+                Vous avez{" "}
+                <span className="font-semibold text-gray-900">
+                  {storys.length}
+                </span>{" "}
                 histoir{storys.length > 1 ? "es" : "e"}
               </p>
             </div>

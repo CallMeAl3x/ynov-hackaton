@@ -17,11 +17,15 @@ export async function Dashboard() {
       <Navbar />
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-12">
+      <main className="max-w-6xl mx-auto px-4 py-6">
         {/* Welcome Section */}
         <div className="mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Vos histoires</h2>
-          <p className="text-gray-600">Gérez et créez vos histoires incroyables</p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">
+            Vos histoires
+          </h2>
+          <p className="text-gray-600">
+            Gérez et créez vos histoires incroyables
+          </p>
         </div>
 
         {/* Create Button */}
@@ -33,7 +37,10 @@ export async function Dashboard() {
             </Button>
           </Link>
           <Link href="/storys">
-            <Button variant="outline" className="inline-flex items-center gap-2">
+            <Button
+              variant="outline"
+              className="inline-flex items-center gap-2"
+            >
               Voir toutes les histoires
               <ArrowRight className="w-4 h-4" />
             </Button>
@@ -68,7 +75,10 @@ export async function Dashboard() {
                     <p className="text-xs text-gray-500">
                       {story.theme && (
                         <span>
-                          Thème: <span className="font-medium capitalize">{story.theme}</span>
+                          Thème:{" "}
+                          <span className="font-medium capitalize">
+                            {story.theme}
+                          </span>
                         </span>
                       )}
                     </p>
@@ -109,17 +119,23 @@ export async function Dashboard() {
         {/* Quick Stats */}
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="p-6 bg-blue-50 border-blue-200">
-            <p className="text-sm font-medium text-blue-600 mb-2">Total d'histoires</p>
+            <p className="text-sm font-medium text-blue-600 mb-2">
+              Total d'histoires
+            </p>
             <p className="text-3xl font-bold text-blue-900">{stories.length}</p>
           </Card>
           <Card className="p-6 bg-green-50 border-green-200">
-            <p className="text-sm font-medium text-green-600 mb-2">Histoires publiées</p>
+            <p className="text-sm font-medium text-green-600 mb-2">
+              Histoires publiées
+            </p>
             <p className="text-3xl font-bold text-green-900">
               {stories.filter((s: any) => s.status === "PUBLISHED").length}
             </p>
           </Card>
           <Card className="p-6 bg-yellow-50 border-yellow-200">
-            <p className="text-sm font-medium text-yellow-600 mb-2">En brouillon</p>
+            <p className="text-sm font-medium text-yellow-600 mb-2">
+              En brouillon
+            </p>
             <p className="text-3xl font-bold text-yellow-900">
               {stories.filter((s: any) => s.status === "DRAFT").length}
             </p>

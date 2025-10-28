@@ -10,9 +10,12 @@ import { RegisterSchema } from "@/schemas";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { useSearchParams } from "next/navigation";
 import * as z from "zod";
 
 export const RegisterForm = () => {
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl");
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
@@ -29,18 +32,21 @@ export const RegisterForm = () => {
     setError("");
     setSuccess("");
     startTransition(() => {
-      register(values).then((data) => {
+      register(values, callbackUrl).then((data) => {
         setSuccess(data.success);
         setError(data.error);
       });
     });
   };
 
+  // Preserve callbackUrl when redirecting to login
+  const loginHref = callbackUrl ? `/auth/login?callbackUrl=${callbackUrl}` : "/auth/login";
+
   return (
     <CardWrapper
       headerLabel="Créer un compte"
       backButtonLabel="Déjà inscrit ? Se connecter"
-      backButtonHref="/auth/login"
+      backButtonHref={loginHref}
       showSocial
     >
       <Form {...form}>
