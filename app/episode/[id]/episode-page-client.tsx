@@ -6,11 +6,11 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { EpisodeClient } from "./episode-client";
-import { EditEpisodeModal } from "./edit-episode-modal";
 import { deleteEpisode } from "@/actions/delete-episode";
 import { publishEpisode } from "@/actions/publish-episode";
 import { unpublishEpisode } from "@/actions/unpublish-episode";
 import { ArrowLeft, Edit, Trash2, Globe, EyeOff } from "lucide-react";
+import { EditEpisodeModal } from "@/components/modals/edit-episode-modal";
 
 interface EpisodePageClientProps {
   episodeId: string;
@@ -195,7 +195,7 @@ export function EpisodePageClient({
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-4xl mx-auto px-4 py-6">
         {/* Episode Info Card */}
         <Card className="p-6 mb-8 bg-blue-50 border-blue-200">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Edit, Trash2 } from "lucide-react";
 import { deleteCharacter } from "@/actions/delete-character";
 import { getRoleLabel, getRoleBadgeColor } from "@/lib/role-utils";
-import { EditCharacterModal } from "./edit-character-modal";
+import { EditCharacterModal } from "@/components/modals/edit-character-modal";
 
 type Character = {
   id: string;
@@ -77,7 +77,7 @@ export function CharacterDetailClient({
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4">
+    <div className="max-w-4xl mx-auto px-4 py-6">
       {/* Back Button */}
       <Link
         href={`/story/${story.id}`}

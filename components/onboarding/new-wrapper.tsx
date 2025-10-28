@@ -16,9 +16,9 @@ export default function OnboardingNewWrapper({
   isAuthenticated,
 }: Props) {
   const router = useRouter();
-  const [creationType, setCreationType] = useState<"ai-guided" | "manual" | null>(
-    initialCreationType
-  );
+  const [creationType, setCreationType] = useState<
+    "ai-guided" | "manual" | null
+  >(initialCreationType);
 
   const handleChoose = (choice: "ai-guided" | "manual") => {
     // Update URL with the type parameter
@@ -47,7 +47,7 @@ export default function OnboardingNewWrapper({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white py-4 px-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Show choice screen if no type selected yet */}
         {!creationType ? (
           <>
@@ -57,7 +57,8 @@ export default function OnboardingNewWrapper({
                 Créez Votre Première Histoire
               </h1>
               <p className="text-center text-gray-600 max-w-2xl mx-auto">
-                Quel niveau de contrôle souhaitez-vous sur la création de votre histoire ?
+                Quel niveau de contrôle souhaitez-vous sur la création de votre
+                histoire ?
               </p>
             </div>
 
@@ -69,7 +70,8 @@ export default function OnboardingNewWrapper({
             {/* Footer Info */}
             <div className="mt-12 text-center text-gray-500 text-sm">
               <p>
-                Aucun compte nécessaire pour créer. Vous pouvez enregistrer votre histoire une fois terminée.
+                Aucun compte nécessaire pour créer. Vous pouvez enregistrer
+                votre histoire une fois terminée.
               </p>
             </div>
           </>

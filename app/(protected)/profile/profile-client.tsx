@@ -51,7 +51,7 @@ export function ProfileClient({ user, stories }: ProfileClientProps) {
     <>
       {/* Header */}
       <header className="border-b border-gray-200 bg-white">
-        <div className="max-w-6xl mx-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto px-4 py-6">
           <Button
             variant="ghost"
             onClick={() => router.back()}
@@ -64,7 +64,7 @@ export function ProfileClient({ user, stories }: ProfileClientProps) {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 py-6">
+      <main className="max-w-4xl mx-auto px-4 py-6">
         {/* User Info Card */}
         <Card className="p-8 mb-8 bg-gradient-to-r from-sky-50 to-blue-50">
           <div className="flex items-start gap-6">

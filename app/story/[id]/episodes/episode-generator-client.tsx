@@ -174,7 +174,7 @@ export function EpisodeGeneratorClient({
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8">
+      <main className="max-w-4xl mx-auto px-4 py-6">
         {/* Story Context */}
         <Card className="p-6 mb-8 bg-blue-50 border-blue-200">
           <h2 className="font-semibold text-gray-900 mb-4">Contexte</h2>

@@ -26,9 +26,9 @@ import { unpublishEpisode } from "@/actions/unpublish-episode";
 import { deleteEpisode } from "@/actions/delete-episode";
 import { getRoleLabel, getRoleBadgeColor } from "@/lib/role-utils";
 import { EditStoryModal } from "./edit-story-modal";
-import { EditCharacterModal } from "./edit-character-modal";
+import { EditCharacterModal } from "@/components/modals/edit-character-modal";
 import { CreateCharacterModal } from "./create-character-modal";
-import { EditEpisodeModal } from "./edit-episode-modal";
+import { EditEpisodeModal } from "@/components/modals/edit-episode-modal";
 
 type Character = {
   id: string;
@@ -264,9 +264,9 @@ export function StoryViewClient({
   return (
     <div className="min-h-screen bg-white pb-8">
       {/* Mobile-friendly container */}
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Header - Improved for mobile */}
-        <div className="px-4 py-6 sm:py-8">
+        <div>
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
             {title}
           </h1>

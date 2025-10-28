@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { PageHeader } from "@/components/page-header";
 import { Users, BookOpen, FileText, Search, ArrowRight } from "lucide-react";
 
 type Story = {
@@ -46,22 +47,16 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Users className="w-8 h-8 text-sky-600" />
-            <h1 className="text-3xl font-bold text-gray-900">Communauté</h1>
-          </div>
-          <p className="text-gray-600">
-            Découvrez les histoires des {filteredUsers.length} auteur
-            {filteredUsers.length > 1 ? "s" : ""} de la communauté
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        icon={<Users className="w-8 h-8 text-sky-600" />}
+        title="Communauté"
+        description={`Découvrez les histoires des ${filteredUsers.length} auteur${
+          filteredUsers.length > 1 ? "s" : ""
+        } de la communauté`}
+      />
 
       {/* Search */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 py-6">
         <div className="relative mb-8">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
@@ -185,7 +180,7 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
 
       {/* Stats Footer */}
       {filteredUsers.length > 0 && (
-        <div className="max-w-6xl mx-auto px-4 py-6 border-t border-gray-200 mt-8">
+        <div className="max-w-4xl mx-auto px-4 py-6 border-t border-gray-200 mt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="p-6 bg-blue-50 border-blue-200">
               <p className="text-sm font-medium text-blue-600 mb-2">

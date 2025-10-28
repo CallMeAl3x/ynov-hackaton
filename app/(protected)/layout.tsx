@@ -8,7 +8,7 @@ const ProtectedLayout = ({ children }: ProtectedLayoutProps) => {
   return (
     <div>
       <Navbar />
-      <main className="">{children}</main>
+      <main>{children}</main>
     </div>
   );
 };

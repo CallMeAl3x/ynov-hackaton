@@ -4,6 +4,7 @@ import Link from "next/link";
 import { StorysClient } from "./storys-client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/page-header";
 import { BookOpen, Plus } from "lucide-react";
 
 const StorysPage = async () => {
@@ -22,33 +23,22 @@ const StorysPage = async () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
-      {/* Header */}
-      <header className="border-b border-gray-200 bg-white relative">
-        <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between flex-col sm:flex-row gap-4">
-            <div className="flex items-center gap-3">
-              <BookOpen className="w-8 h-8 text-sky-600" />
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">
-                  Mes histoires
-                </h1>
-                <p className="text-sm text-gray-600">
-                  Gérez et créez vos web novels
-                </p>
-              </div>
-            </div>
-            <Link href="/onboarding/new">
-              <Button className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700">
-                <Plus className="w-4 h-4" />
-                Nouvelle histoire
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        icon={<BookOpen className="w-8 h-8 text-sky-600" />}
+        title="Mes histoires"
+        description="Gérez et créez vos web novels"
+        action={
+          <Link href="/onboarding/new">
+            <Button className="inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700">
+              <Plus className="w-4 h-4" />
+              Nouvelle histoire
+            </Button>
+          </Link>
+        }
+      />
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-6">
+      <main className="max-w-4xl mx-auto px-4 py-6">
         {storys.length === 0 ? (
           <Card className="p-16 text-center">
             <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />

@@ -86,7 +86,7 @@ export function EditStoryPage({ story }: EditStoryPageProps) {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-4 px-4">
+    <div className="max-w-4xl mx-auto px-4 py-6">
       {/* Back Button */}
       <Link
         href={`/story/${story.id}`}

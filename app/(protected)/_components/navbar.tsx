@@ -18,7 +18,7 @@ export const Navbar = () => {
 
   return (
     <header className="sticky top-0 w-full bg-white border-b border-gray-200 z-50">
-      <div className="max-w-6xl mx-auto px-4">
+      <div className="max-w-4xl mx-auto px-4">
         <nav className="flex items-center justify-between py-2 sm:py-3">
           {/* Left: logo */}
           <div className="flex items-center space-x-2 sm:space-x-3">

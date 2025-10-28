@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Podium } from "./podium";
 import Link from "next/link";
+import { PageHeader } from "@/components/page-header";
 import { Trophy, TrendingUp } from "lucide-react";
 
 interface RankingUser {
@@ -41,20 +42,20 @@ export const RankingClient = ({ users }: RankingClientProps) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-3 mb-4">
+      <PageHeader
+        centered
+        icon={
+          <>
             <Trophy className="w-8 h-8 md:w-10 md:h-10 text-yellow-500" />
-            <h1 className="text-3xl md:text-5xl font-bold text-gray-900">
-              Classement
-            </h1>
             <Trophy className="w-8 h-8 md:w-10 md:h-10 text-yellow-500" />
-          </div>
-          <p className="text-gray-600 text-base md:text-lg">
-            Découvrez les meilleurs écrivains de la communauté
-          </p>
-        </div>
+          </>
+        }
+        title="Classement"
+        description="Découvrez les meilleurs écrivains de la communauté"
+        border={false}
+      />
+
+      <div className="max-w-4xl mx-auto px-4 py-6">
 
         {/* Filter Buttons */}
         <div className="flex justify-center gap-3 mb-12 flex-wrap">
@@ -180,7 +181,9 @@ export const RankingClient = ({ users }: RankingClientProps) => {
 
           <div className="bg-white rounded-xl shadow-lg p-6 text-center border-t-4 border-purple-500">
             <div className="text-4xl md:text-5xl font-bold text-purple-600 mb-2">
-              {ranking.reduce((sum, user) => sum + user.points, 0).toLocaleString()}
+              {ranking
+                .reduce((sum, user) => sum + user.points, 0)
+                .toLocaleString()}
             </div>
             <p className="text-gray-600 font-semibold">Points totaux</p>
           </div>
@@ -188,18 +191,26 @@ export const RankingClient = ({ users }: RankingClientProps) => {
 
         {/* Info Banner */}
         <div className="mt-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl p-8 text-white text-center">
-          <h3 className="text-2xl font-bold mb-4">Comment gagner des points?</h3>
+          <h3 className="text-2xl font-bold mb-4">
+            Comment gagner des points?
+          </h3>
           <ul className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm md:text-base">
             <li>
-              <span className="font-bold block mb-2">📝 Publier une histoire</span>
+              <span className="font-bold block mb-2">
+                📝 Publier une histoire
+              </span>
               <span>+100 points</span>
             </li>
             <li>
-              <span className="font-bold block mb-2">💬 Obtenir des commentaires</span>
+              <span className="font-bold block mb-2">
+                💬 Obtenir des commentaires
+              </span>
               <span>+10 points par commentaire</span>
             </li>
             <li>
-              <span className="font-bold block mb-2">⭐ Recevoir des votes</span>
+              <span className="font-bold block mb-2">
+                ⭐ Recevoir des votes
+              </span>
               <span>+25 points par vote</span>
             </li>
           </ul>
