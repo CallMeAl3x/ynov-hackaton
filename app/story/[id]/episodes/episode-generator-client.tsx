@@ -13,7 +13,13 @@ import { createEpisode } from "@/actions/create-episode";
 import { buildEpisodePrompt } from "@/lib/prompts";
 import { getRoleLabel, getRoleBadgeColor } from "@/lib/role-utils";
 import { MarkdownPreview } from "./markdown-preview";
-import { ArrowLeft, Sparkles, Loader, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  ArrowLeft,
+  Sparkles,
+  Loader,
+  ChevronDown,
+  ChevronUp,
+} from "lucide-react";
 
 type Character = {
   id: string;
@@ -157,10 +163,7 @@ export function EpisodeGeneratorClient({
         try {
           const chunk = JSON.parse(buffer);
           const token =
-            chunk?.message?.content ??
-            chunk?.response ??
-            chunk?.content ??
-            "";
+            chunk?.message?.content ?? chunk?.response ?? chunk?.content ?? "";
           if (token) {
             fullContent += token;
             setEpisodeContent(fullContent);
@@ -236,7 +239,7 @@ export function EpisodeGeneratorClient({
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
       {/* Header */}
       <header className="border-b border-gray-200 bg-white">
-        <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="max-w-5xl mx-auto px-4 py-6">
           <Link
             href={`/story/${story.id}`}
             className="inline-flex items-center gap-2 text-sm text-sky-600 hover:text-sky-700 mb-4"
@@ -251,7 +254,7 @@ export function EpisodeGeneratorClient({
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-6">
+      <main className="max-w-5xl mx-auto px-4 py-6">
         {/* Story Context */}
         <Card className="p-6 mb-8 bg-blue-50 border-blue-200">
           <h2 className="font-semibold text-gray-900 mb-4">Contexte</h2>
@@ -278,7 +281,12 @@ export function EpisodeGeneratorClient({
             <div className="space-y-2">
               {characters.map((char) => (
                 <div key={char.id} className="flex items-start gap-2">
-                  <Badge variant="outline" className={`flex-shrink-0 mt-1 ${getRoleBadgeColor(char.role)}`}>
+                  <Badge
+                    variant="outline"
+                    className={`flex-shrink-0 mt-1 ${getRoleBadgeColor(
+                      char.role
+                    )}`}
+                  >
                     {getRoleLabel(char.role)}
                   </Badge>
                   <div className="flex-1">
@@ -355,7 +363,8 @@ export function EpisodeGeneratorClient({
               disabled={isGenerating}
             >
               <span className="font-medium text-gray-900">
-                {showGuidance ? "Masquer" : "Afficher"} les options de génération
+                {showGuidance ? "Masquer" : "Afficher"} les options de
+                génération
               </span>
               {showGuidance ? (
                 <ChevronUp className="w-5 h-5 text-gray-600" />
@@ -367,16 +376,29 @@ export function EpisodeGeneratorClient({
             {showGuidance && (
               <div className="px-4 pb-4 border-t border-gray-200 space-y-3">
                 <div className="bg-blue-50 border border-blue-200 rounded p-3 text-sm text-blue-800">
-                  <p className="font-semibold mb-1">Comment guider la génération ?</p>
+                  <p className="font-semibold mb-1">
+                    Comment guider la génération ?
+                  </p>
                   <ul className="space-y-1 text-xs ml-4 list-disc">
-                    <li><strong>Aucun texte :</strong> L'IA générera librement basée sur votre histoire</li>
-                    <li><strong>Avec guidage :</strong> Ex: "La protagoniste rencontre un mentor mystérieux"</li>
-                    <li><strong>Spécifique :</strong> Ex: "Focus sur le combat final avec dialogue dramatique"</li>
+                    <li>
+                      <strong>Aucun texte :</strong> L'IA générera librement
+                      basée sur votre histoire
+                    </li>
+                    <li>
+                      <strong>Avec guidage :</strong> Ex: "La protagoniste
+                      rencontre un mentor mystérieux"
+                    </li>
+                    <li>
+                      <strong>Spécifique :</strong> Ex: "Focus sur le combat
+                      final avec dialogue dramatique"
+                    </li>
                   </ul>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="guidance">Guidage optionnel pour la génération</Label>
+                  <Label htmlFor="guidance">
+                    Guidage optionnel pour la génération
+                  </Label>
                   <Textarea
                     id="guidance"
                     value={guidancePrompt}
@@ -418,7 +440,10 @@ export function EpisodeGeneratorClient({
             </Button>
 
             <Link href={`/story/${story.id}`} className="w-full sm:w-auto">
-              <Button variant="outline" className="w-full flex items-center justify-center py-3 sm:py-2 font-medium">
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-center py-3 sm:py-2 font-medium"
+              >
                 Annuler
               </Button>
             </Link>

@@ -25,7 +25,7 @@ export const PageHeader = ({
         border ? "border-b border-gray-200" : ""
       } bg-white ${className}`}
     >
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto px-4 py-6">
         {centered ? (
           <div className="text-center">
             {icon && (
@@ -37,7 +37,9 @@ export const PageHeader = ({
               {title}
             </h1>
             {description && (
-              <p className="text-gray-600 text-base md:text-lg">{description}</p>
+              <p className="text-gray-600 text-base md:text-lg">
+                {description}
+              </p>
             )}
           </div>
         ) : (

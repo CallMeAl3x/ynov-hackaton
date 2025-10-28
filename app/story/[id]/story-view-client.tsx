@@ -16,6 +16,7 @@ import {
   Globe,
   Eye,
   EyeOff,
+  FileDown,
 } from "lucide-react";
 import { deleteStory } from "@/actions/delete-story";
 import { deleteCharacter } from "@/actions/delete-character";
@@ -261,10 +262,140 @@ export function StoryViewClient({
     }
   };
 
+  const handleExportEpisodePDF = async (episode: typeof initialEpisodes[0]) => {
+    try {
+      const { marked } = await import("marked");
+      const html2pdf = (await import("html2pdf.js")).default;
+
+      // Parse markdown to HTML
+      const htmlContent = await marked(episode.content);
+
+      // Create a container with the episode content
+      const element = document.createElement("div");
+      element.innerHTML = `
+        <div style="padding: 40px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+          <h1 style="margin: 0 0 10px 0; font-size: 28px; color: #1a1a1a;">${episode.name}</h1>
+          <p style="color: #666; margin: 0 0 10px 0; font-size: 14px;">
+            Épisode ${episode.order}
+          </p>
+          <p style="color: #999; margin: 0 0 20px 0; font-size: 12px;">
+            Créé le ${
+            typeof episode.createdAt === "string"
+              ? new Date(episode.createdAt).toLocaleDateString("fr-FR")
+              : episode.createdAt.toLocaleDateString("fr-FR")
+          }
+          </p>
+          <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+          <div style="line-height: 1.8; color: #333; font-size: 14px;">
+            ${htmlContent}
+          </div>
+        </div>
+      `;
+
+      // Apply styles to markdown-generated elements
+      const styles = `
+        <style>
+          h1, h2, h3, h4, h5, h6 {
+            margin: 24px 0 12px 0;
+            font-weight: 600;
+            color: #1a1a1a;
+          }
+          h1 { font-size: 24px; }
+          h2 { font-size: 20px; }
+          h3 { font-size: 18px; }
+          h4, h5, h6 { font-size: 16px; }
+          p {
+            margin: 12px 0;
+            line-height: 1.8;
+          }
+          ul, ol {
+            margin: 12px 0;
+            padding-left: 24px;
+          }
+          li {
+            margin: 6px 0;
+          }
+          blockquote {
+            margin: 12px 0;
+            padding: 12px 16px;
+            border-left: 4px solid #ddd;
+            background-color: #f9f9f9;
+            color: #666;
+          }
+          code {
+            background-color: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+          }
+          pre {
+            background-color: #f5f5f5;
+            padding: 12px;
+            border-radius: 3px;
+            overflow-x: auto;
+            margin: 12px 0;
+          }
+          pre code {
+            background-color: transparent;
+            padding: 0;
+          }
+          strong {
+            font-weight: 600;
+          }
+          em {
+            font-style: italic;
+          }
+          a {
+            color: #0066cc;
+            text-decoration: none;
+          }
+          a:hover {
+            text-decoration: underline;
+          }
+          hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 20px 0;
+          }
+          table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+          }
+          th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+          }
+          th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+          }
+        </style>
+      `;
+
+      element.innerHTML = styles + element.innerHTML;
+
+      const options = {
+        margin: 10,
+        filename: `${episode.name}.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { orientation: "portrait", unit: "mm", format: "a4" },
+      };
+
+      html2pdf().set(options).from(element).save();
+    } catch (error) {
+      console.error("Error exporting PDF:", error);
+      alert("Erreur lors de l'export PDF");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white pb-8">
       {/* Mobile-friendly container */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto px-4 py-6">
         {/* Header - Improved for mobile */}
         <div>
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">
@@ -530,13 +661,22 @@ export function StoryViewClient({
                                   <p className="m-0 inline" {...props} />
                                 ),
                                 h1: ({ node, ...props }) => (
-                                  <h1 className="inline text-sm font-bold m-0" {...props} />
+                                  <h1
+                                    className="inline text-sm font-bold m-0"
+                                    {...props}
+                                  />
                                 ),
                                 h2: ({ node, ...props }) => (
-                                  <h2 className="inline text-sm font-bold m-0" {...props} />
+                                  <h2
+                                    className="inline text-sm font-bold m-0"
+                                    {...props}
+                                  />
                                 ),
                                 h3: ({ node, ...props }) => (
-                                  <h3 className="inline text-sm font-bold m-0" {...props} />
+                                  <h3
+                                    className="inline text-sm font-bold m-0"
+                                    {...props}
+                                  />
                                 ),
                                 ul: ({ node, ...props }) => (
                                   <ul className="inline m-0" {...props} />
@@ -568,19 +708,33 @@ export function StoryViewClient({
                           </p>
                         </Link>
 
-                        {isAuthor && (
-                          <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 w-full mt-2">
-                            <button
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setEditingEpisodeId(episode.id);
-                              }}
-                              className="flex items-center justify-center sm:justify-start gap-1 rounded-lg px-3 py-2 sm:py-1 text-xs sm:text-sm text-sky-600 hover:bg-sky-100 active:bg-sky-200 transition-colors whitespace-nowrap"
-                            >
-                              <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
-                              <span className="hidden sm:inline">Modifier</span>
-                              <span className="sm:hidden">Édit.</span>
-                            </button>
+                        <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 w-full mt-2 flex-wrap">
+                          {/* PDF Export Button - Visible to everyone */}
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleExportEpisodePDF(episode);
+                            }}
+                            className="flex items-center justify-center sm:justify-start gap-1 rounded-lg px-3 py-2 sm:py-1 text-xs sm:text-sm text-purple-600 hover:bg-purple-100 active:bg-purple-200 transition-colors whitespace-nowrap"
+                          >
+                            <FileDown className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">Télécharger PDF</span>
+                            <span className="sm:hidden">PDF</span>
+                          </button>
+
+                          {isAuthor && (
+                            <>
+                              <button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setEditingEpisodeId(episode.id);
+                                }}
+                                className="flex items-center justify-center sm:justify-start gap-1 rounded-lg px-3 py-2 sm:py-1 text-xs sm:text-sm text-sky-600 hover:bg-sky-100 active:bg-sky-200 transition-colors whitespace-nowrap"
+                              >
+                                <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <span className="hidden sm:inline">Modifier</span>
+                                <span className="sm:hidden">Édit.</span>
+                              </button>
                             {!episode.published && (
                               <button
                                 onClick={(e) => {
@@ -591,7 +745,9 @@ export function StoryViewClient({
                                 className="flex items-center justify-center sm:justify-start gap-1 rounded-lg px-3 py-2 sm:py-1 text-xs sm:text-sm bg-green-600 text-white hover:bg-green-700 active:bg-green-800 transition-colors whitespace-nowrap disabled:opacity-50"
                               >
                                 <Globe className="w-3 h-3 sm:w-4 sm:h-4" />
-                                <span className="hidden sm:inline">Publier</span>
+                                <span className="hidden sm:inline">
+                                  Publier
+                                </span>
                                 <span className="sm:hidden">Pub.</span>
                               </button>
                             )}
@@ -605,7 +761,9 @@ export function StoryViewClient({
                                 className="flex items-center justify-center sm:justify-start gap-1 rounded-lg px-3 py-2 sm:py-1 text-xs sm:text-sm bg-orange-600 text-white hover:bg-orange-700 active:bg-orange-800 transition-colors whitespace-nowrap disabled:opacity-50"
                               >
                                 <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" />
-                                <span className="hidden sm:inline">Dépublier</span>
+                                <span className="hidden sm:inline">
+                                  Dépublier
+                                </span>
                                 <span className="sm:hidden">Dépub.</span>
                               </button>
                             )}
@@ -618,11 +776,14 @@ export function StoryViewClient({
                               className="flex items-center justify-center sm:justify-start gap-1 rounded-lg px-3 py-2 sm:py-1 text-xs sm:text-sm text-red-600 hover:bg-red-100 active:bg-red-200 transition-colors whitespace-nowrap disabled:opacity-50"
                             >
                               <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                              <span className="hidden sm:inline">Supprimer</span>
+                              <span className="hidden sm:inline">
+                                Supprimer
+                              </span>
                               <span className="sm:hidden">Supp.</span>
                             </button>
-                          </div>
-                        )}
+                            </>
+                          )}
+                        </div>
                       </div>
                     </Card>
                   ))}

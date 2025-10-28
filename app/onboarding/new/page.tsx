@@ -1,5 +1,11 @@
+import { Metadata } from "next";
 import OnboardingNewWrapper from "@/components/onboarding/new-wrapper";
 import { currentUser } from "@/lib/auth";
+
+export const metadata: Metadata = {
+  title: "Create Story - Pensaga",
+  description: "Create a new story on Pensaga.",
+};
 
 type Props = {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;

@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import { getStoryByUserId } from "@/lib/story";
 import { currentUser } from "@/lib/auth";
 import Link from "next/link";
@@ -6,6 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/page-header";
 import { BookOpen, Plus } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "My Stories - Pensaga",
+  description: "Browse and manage your stories on Pensaga.",
+};
 
 const StorysPage = async () => {
   const user = await currentUser();
@@ -38,7 +44,7 @@ const StorysPage = async () => {
       />
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 py-6">
+      <main className="max-w-5xl mx-auto px-4 py-6">
         {storys.length === 0 ? (
           <Card className="p-16 text-center">
             <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />

@@ -1,7 +1,13 @@
+import { Metadata } from "next";
 import { currentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { ProfileClient } from "./profile-client";
 import { getStoryByUserId } from "@/lib/story";
+
+export const metadata: Metadata = {
+  title: "My Profile - Pensaga",
+  description: "Manage your Pensaga profile and view your stories.",
+};
 
 export default async function ProfilePage() {
   const user = await currentUser();

@@ -55,8 +55,7 @@ export const RankingClient = ({ users }: RankingClientProps) => {
         border={false}
       />
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
-
+      <div className="max-w-5xl mx-auto px-4 py-6">
         {/* Filter Buttons */}
         <div className="flex justify-center gap-3 mb-12 flex-wrap">
           {FILTER_OPTIONS.map((option) => (

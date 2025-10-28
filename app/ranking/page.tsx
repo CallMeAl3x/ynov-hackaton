@@ -1,5 +1,11 @@
+import { Metadata } from "next";
 import { PrismaClient } from "@prisma/client";
 import { RankingClient } from "./ranking-client";
+
+export const metadata: Metadata = {
+  title: "Rankings - Pensaga",
+  description: "View Pensaga creator rankings and statistics.",
+};
 
 const prisma = new PrismaClient();
 

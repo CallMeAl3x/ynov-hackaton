@@ -1,4 +1,10 @@
+import { Metadata } from "next";
 "use client";
+
+export const metadata: Metadata = {
+  title: "Onboarding - Pensaga",
+  description: "Welcome to Pensaga! Get started with your first story.",
+};
 
 import { useRouter } from "next/navigation";
 import { ControlLevelChoice } from "@/components/onboarding/control-level-choice";
@@ -13,7 +19,7 @@ const OnBoarding = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-center mb-2 text-gray-900">

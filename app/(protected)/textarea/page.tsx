@@ -1,4 +1,10 @@
+import { Metadata } from "next";
 "use client";
+
+export const metadata: Metadata = {
+  title: "Ollama Test - Pensaga",
+  description: "Test Ollama API integration with prompts.",
+};
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -68,10 +74,7 @@ export default function Page() {
             try {
               const part = JSON.parse(line);
               const token =
-                part?.message?.content ??
-                part?.response ??
-                part?.content ??
-                "";
+                part?.message?.content ?? part?.response ?? part?.content ?? "";
               if (token) {
                 accum += token;
                 setResponseText(accum); // affichage progressif
@@ -125,11 +128,14 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto px-4 py-6">
         <header className="mb-6">
-          <h1 className="text-3xl font-semibold tracking-tight">Notes → Ollama Cloud</h1>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Notes → Ollama Cloud
+          </h1>
           <p className="text-sm text-gray-600 mt-1">
-            Tape ton prompt ci-dessous, choisis le modèle, et envoie (Ctrl/⌘ + Enter pour envoyer).
+            Tape ton prompt ci-dessous, choisis le modèle, et envoie (Ctrl/⌘ +
+            Enter pour envoyer).
           </p>
         </header>
 
@@ -153,7 +159,10 @@ export default function Page() {
             <p id="note-help" className="text-xs text-gray-500">
               Astuce : Ctrl/⌘ + Enter pour envoyer.
             </p>
-            <span id="note-counter" className="text-xs tabular-nums text-gray-500">
+            <span
+              id="note-counter"
+              className="text-xs tabular-nums text-gray-500"
+            >
               {text.length}/{MAX}
             </span>
           </div>
@@ -212,11 +221,16 @@ export default function Page() {
 
           {/* Réponse / erreur */}
           <div className="mt-4">
-            {error && <div className="mb-3 text-sm text-red-600">Erreur: {error}</div>}
+            {error && (
+              <div className="mb-3 text-sm text-red-600">Erreur: {error}</div>
+            )}
 
             {responseText && (
               <div className="mt-2">
-                <label htmlFor="ai-response" className="block text-sm font-medium mb-2">
+                <label
+                  htmlFor="ai-response"
+                  className="block text-sm font-medium mb-2"
+                >
                   Réponse de l&apos;IA
                 </label>
                 <Textarea
@@ -232,8 +246,9 @@ export default function Page() {
         </section>
 
         <footer className="mt-8 text-xs text-gray-500">
-          Cette page envoie la requête à <code>/api/ollama</code> (backend) qui doit pointer vers
-          Ollama Cloud (host <code>https://ollama.com</code> avec header <code>Authorization</code>).
+          Cette page envoie la requête à <code>/api/ollama</code> (backend) qui
+          doit pointer vers Ollama Cloud (host <code>https://ollama.com</code>{" "}
+          avec header <code>Authorization</code>).
         </footer>
       </div>
     </div>

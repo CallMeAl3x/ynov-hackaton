@@ -6,7 +6,17 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { PageHeader } from "@/components/page-header";
-import { Users, BookOpen, FileText, Search, ArrowRight } from "lucide-react";
+import { Users, BookOpen, FileText, Search, ArrowRight, FileDown } from "lucide-react";
+
+const handleDownloadPDF = (storyId: string, storyName: string) => {
+  const downloadUrl = `/api/download-story-pdfs?storyId=${storyId}`;
+  const link = document.createElement('a');
+  link.href = downloadUrl;
+  link.download = `${storyName}-episodes.zip`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 
 type Story = {
   id: string;
@@ -50,13 +60,13 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
       <PageHeader
         icon={<Users className="w-8 h-8 text-sky-600" />}
         title="Communauté"
-        description={`Découvrez les histoires des ${filteredUsers.length} auteur${
-          filteredUsers.length > 1 ? "s" : ""
-        } de la communauté`}
+        description={`Découvrez les histoires des ${
+          filteredUsers.length
+        } auteur${filteredUsers.length > 1 ? "s" : ""} de la communauté`}
       />
 
       {/* Search */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-5xl mx-auto px-4 py-6">
         <div className="relative mb-8">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
           <Input
@@ -119,8 +129,8 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
                   <div className="mt-3 ml-4 space-y-3 border-l-2 border-sky-200 pl-4 flex flex-col gap-2">
                     {user.stories.length > 0 ? (
                       user.stories.map((story) => (
-                        <Link key={story.id} href={`/story/${story.id}`}>
-                          <Card className="p-4 hover:shadow-md transition-shadow cursor-pointer group">
+                        <div key={story.id}>
+                          <Card className="p-4 hover:shadow-md transition-shadow group">
                             <div className="flex items-start justify-between mb-2">
                               <h3 className="text-base font-medium text-gray-900 group-hover:text-sky-600 transition-colors line-clamp-1">
                                 {story.name}
@@ -150,9 +160,29 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
                                   : "personnage"}
                               </span>
                             </div>
+                            <div className="mt-3 flex gap-2">
+                              <a
+                                href={`/story/${story.id}`}
+                                className="flex-1 flex items-center justify-center gap-1 rounded-md border border-sky-200 px-2 py-1.5 text-xs text-sky-600 hover:bg-sky-50 transition-colors"
+                              >
+                                <ArrowRight className="w-3 h-3" />
+                                <span>Voir</span>
+                              </a>
+                              {story._count?.episodes > 0 && (
+                                <button
+                                  onClick={() => handleDownloadPDF(story.id, story.name)}
+                                  className="flex-1 flex items-center justify-center gap-1 rounded-md border border-purple-200 px-2 py-1.5 text-xs text-purple-600 hover:bg-purple-50 transition-colors"
+                                  title={`${story._count?.episodes || 0} épisode${(story._count?.episodes || 0) > 1 ? 's' : ''}`}
+                                >
+                                  <FileDown className="w-3 h-3" />
+                                  <span>PDF</span>
+                                </button>
+                              )}
+                            </div>
                           </Card>
-                        </Link>
+                        </div>
                       ))
+
                     ) : (
                       <p className="text-sm text-gray-600">
                         Aucune histoire publiée
@@ -180,7 +210,7 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
 
       {/* Stats Footer */}
       {filteredUsers.length > 0 && (
-        <div className="max-w-4xl mx-auto px-4 py-6 border-t border-gray-200 mt-8">
+        <div className="max-w-5xl mx-auto px-4 py-6 border-t border-gray-200 mt-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="p-6 bg-blue-50 border-blue-200">
               <p className="text-sm font-medium text-blue-600 mb-2">

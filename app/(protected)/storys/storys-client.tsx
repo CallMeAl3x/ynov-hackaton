@@ -6,8 +6,8 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Edit, Trash2, BookOpen, FileDown } from "lucide-react";
 import { deleteStory } from "@/actions/delete-story";
-import { Edit, Trash2, BookOpen } from "lucide-react";
 
 type Story = {
   id: string;
@@ -46,6 +46,17 @@ export function StorysClient({ stories }: StorysClientProps) {
       setDeletingId(null);
     }
   };
+  const handleExportPDF = async (storyId: string) => {
+    try {
+      const story = stories.find((s) => s.id === storyId);
+      if (!story) return;
+
+      router.push(`/story/${storyId}`);
+      // PDF download will be available on the story detail page
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const formatDate = (date: Date | string) => {
     const d = typeof date === "string" ? new Date(date) : date;
@@ -59,7 +70,10 @@ export function StorysClient({ stories }: StorysClientProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {stories.map((story) => (
-        <Card key={story.id} className="h-full p-6 hover:shadow-lg transition-shadow group">
+        <Card
+          key={story.id}
+          className="h-full p-6 hover:shadow-lg transition-shadow group"
+        >
           <div className="flex items-start justify-between mb-4">
             <BookOpen className="w-8 h-8 text-sky-600 group-hover:scale-110 transition-transform" />
             <Badge
@@ -87,10 +101,20 @@ export function StorysClient({ stories }: StorysClientProps) {
             <Badge variant="outline" className="capitalize">
               {story.theme}
             </Badge>
-            <span className="text-xs text-gray-500">{formatDate(story.createdAt)}</span>
+            <span className="text-xs text-gray-500">
+              {formatDate(story.createdAt)}
+            </span>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 flex-wrap">
+            <button
+              onClick={() => router.push(`/story/${story.id}`)}
+              className="flex-1 rounded-md border border-purple-200 px-3 py-2 text-xs text-purple-600 hover:bg-purple-50 transition-colors"
+            >
+              <FileDown className="w-4 h-4 inline mr-1" />
+              PDF
+            </button>
+
             <Link href={`/story/${story.id}`} className="flex-1">
               <Button variant="outline" className="w-full" size="sm">
                 <BookOpen className="w-4 h-4 mr-1" />

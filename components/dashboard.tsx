@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Plus, ArrowRight, User } from "lucide-react";
+import { BookOpen, Plus, ArrowRight, User, FileDown } from "lucide-react";
 import Navbar from "@/app/(protected)/_components/navbar";
 
 export async function Dashboard() {
@@ -17,7 +17,7 @@ export async function Dashboard() {
       <Navbar />
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 py-6">
+      <main className="max-w-5xl mx-auto px-4 py-6">
         {/* Welcome Section */}
         <div className="mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
@@ -83,6 +83,28 @@ export async function Dashboard() {
                       )}
                     </p>
                   </div>
+                  {story._count?.episodes > 0 && (
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          window.open(`/story/${story.id}`, '_self');
+                        }}
+                        className="flex-1 flex items-center justify-center gap-1 rounded-md border border-purple-200 px-2 py-1.5 text-xs text-purple-600 hover:bg-purple-50 transition-colors"
+                        title={`${story._count?.episodes || 0} épisode${(story._count?.episodes || 0) > 1 ? 's' : ''}`}
+                      >
+                        <FileDown className="w-3 h-3" />
+                        <span className="hidden sm:inline">PDF</span>
+                      </button>
+                      <Link href={`/story/${story.id}`} className="flex-1">
+                        <button className="w-full flex items-center justify-center gap-1 rounded-md border border-sky-200 px-2 py-1.5 text-xs text-sky-600 hover:bg-sky-50 transition-colors">
+                          <ArrowRight className="w-3 h-3" />
+                          <span className="hidden sm:inline">Voir</span>
+                        </button>
+                      </Link>
+                    </div>
+                  )}
                 </Card>
               </Link>
             ))}
