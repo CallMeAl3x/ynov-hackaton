@@ -37,7 +37,7 @@ export const LandingNavbar = () => {
               Comment ça marche
             </Link>
             <Link
-              href="/communaute"
+              href="/community"
               className="text-gray-600 hover:text-gray-900 transition"
             >
               Communauté

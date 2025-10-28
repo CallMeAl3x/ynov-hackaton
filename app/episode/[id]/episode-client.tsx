@@ -25,11 +25,15 @@ export function EpisodeClient({ content }: EpisodeClientProps) {
           blockquote: ({ node, ...props }) => (
             <blockquote className="border-l-4 border-sky-400 pl-4 py-2 my-4 bg-sky-50 italic text-gray-700" {...props} />
           ),
-          code: ({ node, inline, ...props }) =>
+          code: ({ node, inline, className, children, ...props }: any) =>
             inline ? (
-              <code className="bg-gray-100 rounded px-2 py-1 text-sm font-mono text-gray-900" {...props} />
+              <code className="bg-gray-100 rounded px-2 py-1 text-sm font-mono text-gray-900" {...props}>
+                {children}
+              </code>
             ) : (
-              <code className="block bg-gray-100 rounded p-4 my-4 text-sm font-mono text-gray-900 overflow-x-auto" {...props} />
+              <code className="block bg-gray-100 rounded p-4 my-4 text-sm font-mono text-gray-900 overflow-x-auto" {...props}>
+                {children}
+              </code>
             ),
           a: ({ node, ...props }) => <a className="text-sky-600 hover:text-sky-700 underline" {...props} />,
           hr: ({ node, ...props }) => <hr className="my-6 border-gray-300" {...props} />,

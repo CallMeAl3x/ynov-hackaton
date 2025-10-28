@@ -5,12 +5,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Book, Users, Info, Trash2, Edit, FileText } from "lucide-react";
+import { Book, Users, Info, Trash2, Edit, FileText, Globe, Eye, EyeOff } from "lucide-react";
 import { deleteStory } from "@/actions/delete-story";
 import { deleteCharacter } from "@/actions/delete-character";
+import { publishStory } from "@/actions/publish-story";
+import { unpublishStory } from "@/actions/unpublish-story";
+import { publishEpisode } from "@/actions/publish-episode";
+import { unpublishEpisode } from "@/actions/unpublish-episode";
+import { deleteEpisode } from "@/actions/delete-episode";
 import { EditStoryModal } from "./edit-story-modal";
 import { EditCharacterModal } from "./edit-character-modal";
 import { CreateCharacterModal } from "./create-character-modal";
+import { EditEpisodeModal } from "./edit-episode-modal";
 
 type Character = {
   id: string;
@@ -51,29 +57,36 @@ interface StoryViewClientProps {
   story: Story;
   characters: Character[];
   episodes: Episode[];
+  isAuthor: boolean;
 }
 
 export function StoryViewClient({
   story,
   characters: initialCharacters,
   episodes: initialEpisodes,
+  isAuthor,
 }: StoryViewClientProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<
     "info" | "characters" | "episodes"
   >("info");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateCharacterModalOpen, setIsCreateCharacterModalOpen] =
     useState(false);
   const [editingCharacterId, setEditingCharacterId] = useState<string | null>(
     null
   );
+  const [editingEpisodeId, setEditingEpisodeId] = useState<string | null>(null);
   const [characters, setCharacters] = useState(initialCharacters);
+  const [episodes, setEpisodes] = useState(initialEpisodes);
+  const [storyStatus, setStoryStatus] = useState(story.status);
   const [storyData, setStoryData] = useState({
     name: story.name ?? "Untitled story",
     theme: story.theme,
   });
+  const [episodeActionsLoading, setEpisodeActionsLoading] = useState<string | null>(null);
 
   const title = storyData.name;
   const description = story.description ?? "";
@@ -100,6 +113,116 @@ export function StoryViewClient({
       console.error(error);
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handlePublish = async () => {
+    setIsPublishing(true);
+    try {
+      const result = await publishStory(story.id);
+      if (result.success) {
+        setStoryStatus("PUBLISHED");
+        router.refresh();
+      } else {
+        alert("Failed to publish story: " + (result.error || "Unknown error"));
+      }
+    } catch (error) {
+      alert("An error occurred while publishing the story");
+      console.error(error);
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  const handleUnpublish = async () => {
+    if (!confirm("Êtes-vous sûr de vouloir remettre cette histoire en brouillon ?")) {
+      return;
+    }
+
+    setIsPublishing(true);
+    try {
+      const result = await unpublishStory(story.id);
+      if (result.success) {
+        setStoryStatus("DRAFT");
+        router.refresh();
+      } else {
+        alert("Failed to unpublish story: " + (result.error || "Unknown error"));
+      }
+    } catch (error) {
+      alert("An error occurred while unpublishing the story");
+      console.error(error);
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  // Filter episodes based on author status
+  const visibleEpisodes = isAuthor
+    ? episodes
+    : episodes.filter(ep => ep.published);
+
+  // Episode action handlers
+  const handlePublishEpisode = async (episodeId: string) => {
+    setEpisodeActionsLoading(episodeId);
+    try {
+      const result = await publishEpisode(episodeId);
+      if (result.success) {
+        setEpisodes(episodes.map(ep =>
+          ep.id === episodeId ? { ...ep, published: true } : ep
+        ));
+        router.refresh();
+      } else {
+        alert("Erreur lors de la publication: " + (result.error || "Erreur inconnue"));
+      }
+    } catch (error) {
+      alert("Une erreur s'est produite");
+      console.error(error);
+    } finally {
+      setEpisodeActionsLoading(null);
+    }
+  };
+
+  const handleUnpublishEpisode = async (episodeId: string) => {
+    if (!confirm("Êtes-vous sûr de vouloir remettre cet épisode en brouillon ?")) {
+      return;
+    }
+    setEpisodeActionsLoading(episodeId);
+    try {
+      const result = await unpublishEpisode(episodeId);
+      if (result.success) {
+        setEpisodes(episodes.map(ep =>
+          ep.id === episodeId ? { ...ep, published: false } : ep
+        ));
+        router.refresh();
+      } else {
+        alert("Erreur lors de la dépublication: " + (result.error || "Erreur inconnue"));
+      }
+    } catch (error) {
+      alert("Une erreur s'est produite");
+      console.error(error);
+    } finally {
+      setEpisodeActionsLoading(null);
+    }
+  };
+
+  const handleDeleteEpisode = async (episodeId: string) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer cet épisode ?")) {
+      return;
+    }
+    setEpisodeActionsLoading(episodeId);
+    try {
+      const result = await deleteEpisode(episodeId);
+      if (result.success) {
+        setEpisodes(episodes.filter(ep => ep.id !== episodeId));
+        router.refresh();
+      } else {
+        alert("Erreur lors de la suppression: " + (result.error || "Erreur inconnue"));
+        setEpisodeActionsLoading(null);
+      }
+    } catch (error) {
+      alert("Une erreur s'est produite");
+      console.error(error);
+      setEpisodeActionsLoading(null);
     }
   };
 
@@ -180,7 +303,7 @@ export function StoryViewClient({
           }`}
         >
           <FileText className="w-5 h-5" />
-          Épisodes {initialEpisodes.length > 0 && `(${initialEpisodes.length})`}
+          Épisodes {visibleEpisodes.length > 0 && `(${visibleEpisodes.length})`}
         </button>
       </div>
 
@@ -338,46 +461,96 @@ export function StoryViewClient({
         {/* Episodes Tab */}
         {activeTab === "episodes" && (
           <div className="space-y-4">
-            {initialEpisodes.length > 0 ? (
+            {visibleEpisodes.length > 0 ? (
               <div className="flex flex-col gap-4">
-                {initialEpisodes.map((episode) => (
-                  <Link key={episode.id} href={`/episode/${episode.id}`}>
-                    <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                            <span className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded">
-                              Épisode {episode.order}
-                            </span>
-                            {!episode.published && (
-                              <Badge className="bg-yellow-100 text-yellow-800">
-                                Brouillon
-                              </Badge>
-                            )}
-                            {episode.published && (
-                              <Badge className="bg-green-100 text-green-800">
-                                Publié
-                              </Badge>
-                            )}
-                          </div>
-                          <h3 className="text-lg font-semibold text-gray-900 mt-2">
-                            {episode.name}
-                          </h3>
-                          <p className="mt-3 text-gray-700 text-sm leading-relaxed line-clamp-3">
-                            {episode.content}
-                          </p>
-                          <p className="mt-3 text-xs text-gray-500">
-                            Créé le{" "}
-                            {typeof episode.createdAt === "string"
-                              ? new Date(episode.createdAt).toLocaleDateString(
-                                  "fr-FR"
-                                )
-                              : episode.createdAt.toLocaleDateString("fr-FR")}
-                          </p>
+                {visibleEpisodes.map((episode) => (
+                  <Card key={episode.id} className="p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex items-start justify-between">
+                      <Link href={`/episode/${episode.id}`} className="flex-1">
+                        <div className="flex items-center gap-3 mb-3">
+                          <span className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded">
+                            Épisode {episode.order}
+                          </span>
+                          {!episode.published && (
+                            <Badge className="bg-yellow-100 text-yellow-800">
+                              Brouillon
+                            </Badge>
+                          )}
+                          {episode.published && (
+                            <Badge className="bg-green-100 text-green-800">
+                              Publié
+                            </Badge>
+                          )}
                         </div>
-                      </div>
-                    </Card>
-                  </Link>
+                        <h3 className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-sky-600">
+                          {episode.name}
+                        </h3>
+                        <p className="mt-3 text-gray-700 text-sm leading-relaxed line-clamp-3">
+                          {episode.content}
+                        </p>
+                        <p className="mt-3 text-xs text-gray-500">
+                          Créé le{" "}
+                          {typeof episode.createdAt === "string"
+                            ? new Date(episode.createdAt).toLocaleDateString(
+                                "fr-FR"
+                              )
+                            : episode.createdAt.toLocaleDateString("fr-FR")}
+                        </p>
+                      </Link>
+
+                      {isAuthor && (
+                        <div className="ml-4 flex flex-col gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setEditingEpisodeId(episode.id);
+                            }}
+                            className="inline-flex items-center gap-1 rounded px-3 py-1 text-sm text-sky-600 hover:bg-sky-50 transition-colors whitespace-nowrap"
+                          >
+                            <Edit className="w-4 h-4" />
+                            Modifier
+                          </button>
+                          {!episode.published && (
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handlePublishEpisode(episode.id);
+                              }}
+                              disabled={episodeActionsLoading === episode.id}
+                              className="inline-flex items-center gap-1 rounded px-3 py-1 text-sm bg-green-600 text-white hover:bg-green-700 transition-colors whitespace-nowrap disabled:opacity-50"
+                            >
+                              <Globe className="w-4 h-4" />
+                              Publier
+                            </button>
+                          )}
+                          {episode.published && (
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                handleUnpublishEpisode(episode.id);
+                              }}
+                              disabled={episodeActionsLoading === episode.id}
+                              className="inline-flex items-center gap-1 rounded px-3 py-1 text-sm bg-orange-600 text-white hover:bg-orange-700 transition-colors whitespace-nowrap disabled:opacity-50"
+                            >
+                              <EyeOff className="w-4 h-4" />
+                              Dépublier
+                            </button>
+                          )}
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleDeleteEpisode(episode.id);
+                            }}
+                            disabled={episodeActionsLoading === episode.id}
+                            className="inline-flex items-center gap-1 rounded px-3 py-1 text-sm text-red-600 hover:bg-red-50 transition-colors whitespace-nowrap disabled:opacity-50"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Supprimer
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
                 ))}
               </div>
             ) : (
@@ -418,6 +591,28 @@ export function StoryViewClient({
                     <FileText className="w-4 h-4" />
                     Créer un épisode
                   </Link>
+
+                  {storyStatus !== "PUBLISHED" && (
+                    <button
+                      onClick={handlePublish}
+                      disabled={isPublishing}
+                      className="inline-flex items-center gap-2 rounded-md bg-green-600 px-6 py-2 text-sm font-medium text-white hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Globe className="w-4 h-4" />
+                      {isPublishing ? "Publication..." : "Publier"}
+                    </button>
+                  )}
+
+                  {storyStatus === "PUBLISHED" && (
+                    <button
+                      onClick={handleUnpublish}
+                      disabled={isPublishing}
+                      className="inline-flex items-center gap-2 rounded-md bg-orange-600 px-6 py-2 text-sm font-medium text-white hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <EyeOff className="w-4 h-4" />
+                      {isPublishing ? "Dépublication..." : "Dépublier"}
+                    </button>
+                  )}
                 </div>
               </div>
               <div>
@@ -541,6 +736,32 @@ export function StoryViewClient({
           ]);
         }}
       />
+
+      {editingEpisodeId && (
+        <EditEpisodeModal
+          open={!!editingEpisodeId}
+          onOpenChange={(open) => {
+            if (!open) setEditingEpisodeId(null);
+          }}
+          episodeId={editingEpisodeId}
+          initialName={
+            episodes.find((ep) => ep.id === editingEpisodeId)?.name || ""
+          }
+          initialContent={
+            episodes.find((ep) => ep.id === editingEpisodeId)?.content || ""
+          }
+          onSuccess={(updatedData) => {
+            setEpisodes(
+              episodes.map((ep) =>
+                ep.id === editingEpisodeId
+                  ? { ...ep, name: updatedData.name, content: updatedData.content }
+                  : ep
+              )
+            );
+            setEditingEpisodeId(null);
+          }}
+        />
+      )}
     </div>
   );
 }

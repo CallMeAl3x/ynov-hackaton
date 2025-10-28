@@ -23,7 +23,7 @@ type Story = {
 type User = {
   id: string;
   name: string | null;
-  email: string;
+  email: string | null;
   stories: Story[];
   _count: {
     stories: number;
@@ -40,7 +40,7 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
 
   const filteredUsers = initialUsers.filter((user) =>
     user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    user.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -91,8 +91,8 @@ export function CommunityClient({ users: initialUsers }: CommunityClientProps) {
                       <p className="text-sm text-gray-600">{user.email}</p>
                     </div>
                     <Badge className="bg-sky-100 text-sky-800">
-                      {user._count.stories}{" "}
-                      {user._count.stories > 1 ? "histoires" : "histoire"}
+                      {user.stories.length}{" "}
+                      {user.stories.length > 1 ? "histoires" : "histoire"}
                     </Badge>
                   </div>
 

@@ -305,7 +305,6 @@ export function EpisodeGeneratorClient({
             <Button
               onClick={handleGenerateWithAI}
               disabled={isGenerating}
-              variant="outline"
               className="inline-flex items-center gap-2"
             >
               {isGenerating ? (

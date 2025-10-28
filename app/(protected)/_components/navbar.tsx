@@ -32,8 +32,15 @@ export const Navbar = () => {
 
             {/* Desktop menu */}
             <div className="hidden md:flex md:items-center md:space-x-6">
-              <a href="/communaute" className="text-gray-700 hover:text-blue-700">Communauté</a>
-              <a href="/storys" className="text-gray-700 hover:text-blue-700">Mes histoires</a>
+              <a
+                href="/community"
+                className="text-gray-700 hover:text-blue-700"
+              >
+                Communauté
+              </a>
+              <a href="/storys" className="text-gray-700 hover:text-blue-700">
+                Mes histoires
+              </a>
             </div>
           </div>
 
@@ -55,12 +62,11 @@ export const Navbar = () => {
               <span className="text-sm font-medium">{coins}</span>
             </div>
 
-             {/* Profile */}
+            {/* Profile */}
             <div className="flex items-center space-x-4">
-               <Link href="/onboarding">
-               </Link>
-               <UserButton />
-             </div>
+              <Link href="/onboarding"></Link>
+              <UserButton />
+            </div>
 
             {/* Burger (mobile) */}
             <button
@@ -71,12 +77,28 @@ export const Navbar = () => {
             >
               <span className="sr-only">Open main menu</span>
               {showMenu ? (
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd"></path>
+                <svg
+                  className="w-6 h-6"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  ></path>
                 </svg>
               ) : (
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd"></path>
+                <svg
+                  className="w-6 h-6"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                    clipRule="evenodd"
+                  ></path>
                 </svg>
               )}
             </button>
@@ -86,12 +108,28 @@ export const Navbar = () => {
         {/* Mobile menu: uniquement les liens */}
         <div
           id="mobile-menu"
-          className={`md:hidden overflow-hidden transition-max-h duration-200 ${showMenu ? "max-h-96" : "max-h-0"}`}
+          className={`md:hidden overflow-hidden transition-max-h duration-200 ${
+            showMenu ? "max-h-96" : "max-h-0"
+          }`}
           aria-hidden={!showMenu}
         >
           <ul className="flex flex-col space-y-2 pb-4">
-            <li><a href="/communaute" className="block px-2 py-2 rounded hover:bg-gray-100">Communauté</a></li>
-            <li><a href="/storys" className="block px-2 py-2 rounded hover:bg-gray-100">Mes histoires</a></li>
+            <li>
+              <a
+                href="/community"
+                className="block px-2 py-2 rounded hover:bg-gray-100"
+              >
+                Communauté
+              </a>
+            </li>
+            <li>
+              <a
+                href="/storys"
+                className="block px-2 py-2 rounded hover:bg-gray-100"
+              >
+                Mes histoires
+              </a>
+            </li>
           </ul>
         </div>
       </div>

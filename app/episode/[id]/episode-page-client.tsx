@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { EpisodeClient } from "./episode-client";
 import { EditEpisodeModal } from "./edit-episode-modal";
 import { deleteEpisode } from "@/actions/delete-episode";
-import { ArrowLeft, Edit, Trash2 } from "lucide-react";
+import { publishEpisode } from "@/actions/publish-episode";
+import { unpublishEpisode } from "@/actions/unpublish-episode";
+import { ArrowLeft, Edit, Trash2, Globe, EyeOff } from "lucide-react";
 
 interface EpisodePageClientProps {
   episodeId: string;
@@ -19,6 +21,7 @@ interface EpisodePageClientProps {
   episodeContent: string;
   createdAt: string;
   isAuthor: boolean;
+  isPublished: boolean;
 }
 
 export function EpisodePageClient({
@@ -30,12 +33,15 @@ export function EpisodePageClient({
   episodeContent,
   createdAt,
   isAuthor,
+  isPublished,
 }: EpisodePageClientProps) {
   const router = useRouter();
   const [content, setContent] = useState(episodeContent);
   const [title, setTitle] = useState(episodeTitle);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [episodePublished, setEpisodePublished] = useState(isPublished);
   const [error, setError] = useState("");
 
   const wordCount = content
@@ -79,6 +85,50 @@ export function EpisodePageClient({
     }
   };
 
+  const handlePublish = async () => {
+    setIsPublishing(true);
+    setError("");
+
+    try {
+      const result = await publishEpisode(episodeId);
+
+      if (result.success) {
+        setEpisodePublished(true);
+        router.refresh();
+      } else {
+        setError(result.error || "Erreur lors de la publication");
+        setIsPublishing(false);
+      }
+    } catch (err) {
+      setError("Une erreur s'est produite");
+      setIsPublishing(false);
+    }
+  };
+
+  const handleUnpublish = async () => {
+    if (!confirm("Êtes-vous sûr de vouloir remettre cet épisode en brouillon ?")) {
+      return;
+    }
+
+    setIsPublishing(true);
+    setError("");
+
+    try {
+      const result = await unpublishEpisode(episodeId);
+
+      if (result.success) {
+        setEpisodePublished(false);
+        router.refresh();
+      } else {
+        setError(result.error || "Erreur lors de la dépublication");
+        setIsPublishing(false);
+      }
+    } catch (err) {
+      setError("Une erreur s'est produite");
+      setIsPublishing(false);
+    }
+  };
+
   return (
     <>
       {/* Header */}
@@ -107,6 +157,28 @@ export function EpisodePageClient({
                   <Edit className="w-4 h-4" />
                   Modifier
                 </Button>
+                {!episodePublished && (
+                  <Button
+                    size="sm"
+                    onClick={handlePublish}
+                    disabled={isPublishing}
+                    className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    <Globe className="w-4 h-4" />
+                    {isPublishing ? "Publication..." : "Publier"}
+                  </Button>
+                )}
+                {episodePublished && (
+                  <Button
+                    size="sm"
+                    onClick={handleUnpublish}
+                    disabled={isPublishing}
+                    className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white"
+                  >
+                    <EyeOff className="w-4 h-4" />
+                    {isPublishing ? "Dépublication..." : "Dépublier"}
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"

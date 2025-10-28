@@ -22,10 +22,30 @@ export const createStory = async (
     // Get current user
     const user = await currentUser();
 
+    console.log("[CREATE_STORY] User from session:", JSON.stringify(user, null, 2));
+
     if (!user || !user.id) {
+      console.log("[CREATE_STORY] User not found or no ID:", user);
       return {
         error: "LOGIN_REQUIRED",
         message: "You must be logged in to save your story",
+        storyId: null
+      };
+    }
+
+    // Verify user exists in database
+    const existingUser = await db.user.findUnique({
+      where: { id: user.id },
+      select: { id: true, email: true, name: true }
+    });
+
+    console.log("[CREATE_STORY] User lookup result:", existingUser);
+
+    if (!existingUser) {
+      console.log("[CREATE_STORY] User ID does not exist in database:", user.id);
+      return {
+        error: "USER_NOT_FOUND",
+        message: "Your user account could not be found in the database",
         storyId: null
       };
     }
@@ -50,7 +70,17 @@ export const createStory = async (
       story
     };
   } catch (error) {
-    console.error("[CREATE_STORY]", error);
+    console.error("[CREATE_STORY] Error:", error);
+    if (error instanceof Error) {
+      console.error("[CREATE_STORY] Error message:", error.message);
+      if (error.message.includes("Foreign key constraint failed")) {
+        return {
+          error: "USER_NOT_FOUND",
+          message: "Your user account could not be found. Please log out and log back in.",
+          storyId: null
+        };
+      }
+    }
     return {
       error: "Failed to create story. Please try again.",
       storyId: null

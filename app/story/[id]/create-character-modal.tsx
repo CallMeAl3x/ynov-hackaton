@@ -62,7 +62,7 @@ export function CreateCharacterModal({
     setIsLoading(true);
 
     try {
-      const result = await createCharacter(storyId, { name, description, role });
+      const result = await createCharacter(storyId, { name, description, role: role as "PROTAGONIST" | "ANTAGONIST" | "SECONDARY" | "MINOR" });
 
       if (result.success && result.character) {
         onSuccess(result.character);

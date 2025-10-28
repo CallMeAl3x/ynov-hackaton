@@ -41,6 +41,7 @@ export default async function EpisodePage({ params }: { params: Promise<{ id: st
         episodeContent={episode.content}
         createdAt={episode.createdAt instanceof Date ? episode.createdAt.toISOString() : episode.createdAt}
         isAuthor={isAuthor}
+        isPublished={episode.published}
       />
     </div>
   );

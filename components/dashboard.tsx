@@ -9,7 +9,7 @@ import Navbar from "@/app/(protected)/_components/navbar";
 
 export async function Dashboard() {
   const user = await currentUser();
-  const stories = user ? await getStoryByUserId(user.id) : [];
+  const stories = user && user.id ? await getStoryByUserId(user.id) : [];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-50 to-white">

@@ -7,6 +7,15 @@ export const getAllUsersWithStories = async () => {
       name: true,
       email: true,
       stories: {
+        where: {
+          status: "PUBLISHED",
+          // Only include stories that have at least one published episode
+          episodes: {
+            some: {
+              published: true,
+            },
+          },
+        },
         select: {
           id: true,
           name: true,
@@ -30,7 +39,15 @@ export const getAllUsersWithStories = async () => {
     },
     where: {
       stories: {
-        some: {},
+        some: {
+          status: "PUBLISHED",
+          // Only include users that have at least one story with a published episode
+          episodes: {
+            some: {
+              published: true,
+            },
+          },
+        },
       },
     },
   });
@@ -46,6 +63,12 @@ export const getUserWithStories = async (userId: string) => {
       stories: {
         where: {
           status: "PUBLISHED",
+          // Only include stories that have at least one published episode
+          episodes: {
+            some: {
+              published: true,
+            },
+          },
         },
         select: {
           id: true,
